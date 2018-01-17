@@ -1,0 +1,236 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics.Contracts;
+using System.Globalization;
+
+namespace InAsync {
+
+    public static partial class ConvertEx {
+
+        #region TryParse
+
+        private static readonly IReadOnlyDictionary<Type, Func<string, Type, IFormatProvider, (bool Success, object Result)>> _tryParsers = new Dictionary<Type, Func<string, Type, IFormatProvider, (bool, object)>> {
+            [typeof(byte)] = (value, conversionType, provider) => (byte.TryParse(value, NumberStyles.Integer, provider, out var tmp), (object)tmp),
+            [typeof(short)] = (value, conversionType, provider) => (short.TryParse(value, NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var tmp), (object)tmp),
+            [typeof(long)] = (value, conversionType, provider) => (long.TryParse(value, NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var tmp), (object)tmp),
+            [typeof(int)] = (value, conversionType, provider) => (int.TryParse(value, NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var tmp), (object)tmp),
+            [typeof(sbyte)] = (value, conversionType, provider) => (sbyte.TryParse(value, NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var tmp), (object)tmp),
+            [typeof(ushort)] = (value, conversionType, provider) => (ushort.TryParse(value, NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var tmp), (object)tmp),
+            [typeof(uint)] = (value, conversionType, provider) => (uint.TryParse(value, NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var tmp), (object)tmp),
+            [typeof(ulong)] = (value, conversionType, provider) => (ulong.TryParse(value, NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var tmp), (object)tmp),
+            [typeof(float)] = (value, conversionType, provider) => (float.TryParse(value, NumberStyles.Float | NumberStyles.AllowThousands, provider, out var tmp), (object)tmp),
+            [typeof(double)] = (value, conversionType, provider) => (double.TryParse(value, NumberStyles.Float | NumberStyles.AllowThousands, provider, out var tmp), (object)tmp),
+            [typeof(decimal)] = (value, conversionType, provider) => (decimal.TryParse(value, NumberStyles.Number, provider, out var tmp), (object)tmp),
+            [typeof(bool)] = (value, conversionType, provider) => (bool.TryParse(value, out var tmp), (object)tmp),
+            [typeof(char)] = (value, conversionType, provider) => (char.TryParse(value, out var tmp), (object)tmp),
+            [typeof(DateTime)] = (value, conversionType, provider) => (DateTime.TryParse(value, provider, DateTimeStyles.None, out var tmp), (object)tmp),
+            [typeof(TimeSpan)] = (value, conversionType, provider) => (TimeSpan.TryParse(value, provider, out var tmp), (object)tmp),
+            [typeof(Enum)] = (value, conversionType, provider) => {
+                // HACK 暫定
+                try {
+                    return (true, Enum.Parse(conversionType, value));
+                }
+                catch (Exception ex) when (ex is ArgumentException || ex is OverflowException) {
+                    return (false, (object)null);
+                }
+            },
+            [typeof(Guid)] = (value, conversionType, provider) => (Guid.TryParse(value, out var tmp), (object)tmp),
+            [typeof(Version)] = (value, conversionType, provider) => (Version.TryParse(value, out var tmp), (object)tmp),
+            [typeof(string)] = (value, conversionType, provider) => (true, (object)value),
+            [typeof(Uri)] = (value, conversionType, provider) => (Uri.TryCreate(value, UriKind.Absolute, out var tmp), (object)tmp),
+        };
+
+        /// <summary>
+        /// 文字列を指定された型に変換します。
+        /// </summary>
+        /// <typeparam name="T">変換後の型</typeparam>
+        /// <param name="input">入力文字列</param>
+        /// <param name="defaultValue">変換に失敗した場合の既定値</param>
+        /// <returns></returns>
+        public static T ToOrDefault<T>(this string input, T defaultValue = default(T))
+            => TryParse<T>(input, out var result) ? result : defaultValue;
+
+        /// <summary>
+        /// 文字列を指定された型に変換します。
+        /// </summary>
+        /// <typeparam name="T">変換後の型</typeparam>
+        /// <param name="input">入力文字列</param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static bool TryParse<T>(string input, out T result)
+            => TryParse<T>(input, CultureInfo.CurrentCulture, out result);
+
+        /// <summary>
+        /// 文字列を指定された型に変換します。
+        /// </summary>
+        /// <typeparam name="T">変換後の型</typeparam>
+        /// <param name="input">入力文字列</param>
+        /// <param name="provider"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static bool TryParse<T>(string input, IFormatProvider provider, out T result) {
+            if (TryParse(typeof(T), input, provider, out var resultObj)) {
+                result = (resultObj != null) ? (T)resultObj : default(T);
+                return true;
+            }
+            else {
+                result = default(T);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 文字列を指定された型に変換します。
+        /// </summary>
+        /// <param name="conversionType">変換後の型</param>
+        /// <param name="input">入力文字列</param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static bool TryParse(Type conversionType, string input, out object result)
+            => TryParse(conversionType, input, CultureInfo.CurrentCulture, out result);
+
+        /// <summary>
+        /// 文字列を指定された型に変換します。
+        /// </summary>
+        /// <param name="conversionType">変換後の型</param>
+        /// <param name="input">入力文字列</param>
+        /// <param name="provider"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static bool TryParse(Type conversionType, string input, IFormatProvider provider, out object result) {
+            if (conversionType == null) throw new ArgumentNullException(nameof(conversionType));
+            Contract.Ensures(Contract.Result<bool>() || Contract.ValueAtReturn(out result) == null);
+            Contract.EndContractBlock();
+
+            var simpleType = Nullable.GetUnderlyingType(conversionType);
+            if (simpleType != null) {
+                conversionType = simpleType;
+            }
+
+            if (input == null) {
+                result = null;
+                return conversionType.IsValueType == false || simpleType != null;
+            }
+
+            // 辞書から変換関数を検索して変換
+            if (_tryParsers.TryGetValue(conversionType, out var parser)) {
+                var parsed = parser(input, conversionType, provider);
+                if (parsed.Success) {
+                    result = parsed.Result;
+                    return true;
+                }
+                else {
+                    result = null;
+                    return false;
+                }
+            }
+
+            // TypeConverter で変換
+            // ※ 同じ型の TryParse と挙動が一致しない事もあるので留意する事
+            var converter = TypeDescriptor.GetConverter(conversionType);
+            if (converter.CanConvertFrom(typeof(string))) {
+                try {
+                    result = converter.ConvertFrom(input);
+                    return true;
+                }
+                catch {
+                    result = null;
+                    return false;
+                }
+            }
+
+            // 重いし、ここまで必要か疑問なので、コメントアウト。
+            //// TryParse メソッド（リフレクション）で変換
+            //var method = conversionType.GetMethod("TryParse", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(string), conversionType }, null);
+            //if (method != null) {
+            //    var args = new[] { input, null };
+            //    if ((bool)method.Invoke(null, args)) {
+            //        result = args[1];
+            //        return true;
+            //    }
+            //    else {
+            //        result = null;
+            //        return false;
+            //    }
+            //}
+
+            result = null;
+            return false;
+        }
+
+        #endregion TryParse
+
+        //#region ToType
+
+        ///// <summary>
+        ///// オブジェクトを任意の型に変換します。
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="self"></param>
+        ///// <param name="defaultValue"></param>
+        ///// <returns></returns>
+        //public static T To<T>(this object self, T defaultValue = default(T)) {
+        //    var result = ToType(self, typeof(T), defaultValue);
+        //    return (result != null) ? (T)result : defaultValue;
+        //}
+
+        ///// <summary>
+        ///// オブジェクトを任意の型に変換します。
+        ///// </summary>
+        ///// <param name="self"></param>
+        ///// <param name="returnType"></param>
+        ///// <param name="defaultValue"></param>
+        ///// <returns></returns>
+        //public static object ToType(this object self, Type returnType, object defaultValue = null) {
+        //    if (returnType == null) throw new ArgumentNullException(nameof(returnType));
+        //    Contract.EndContractBlock();
+
+        //    if (self == null) {
+        //        return defaultValue;
+        //    }
+        //    if (DBNull.Value.Equals(self)) {
+        //        return defaultValue;
+        //    }
+
+        //    var inputType = self.GetType();
+        //    if (inputType == returnType) {
+        //        return self;
+        //    }
+
+        //    // T が nullable の場合の処理
+        //    var underlyingType = Nullable.GetUnderlyingType(returnType);
+        //    if (underlyingType != null) {
+        //        returnType = underlyingType;
+        //        if (inputType == returnType) {
+        //            return self;
+        //        }
+        //    }
+
+        //    switch (Type.GetTypeCode(returnType)) {
+        //        case TypeCode.Empty:
+        //        case TypeCode.Object:
+        //            var tc = TypeDescriptor.GetConverter(returnType);
+        //            if (tc.CanConvertFrom(inputType) == false) {
+        //                return defaultValue;
+        //            }
+
+        //            // TODO: ここで生じる Exception を例外処理を伴わずに処理したい。
+        //            // TypeConverter.IsValid メソッドでは、.NET 4.0 以降、内部で ConvertFrom コールを catch しているだけなので使えない。
+        //            try {
+        //                return tc.ConvertFrom(self);
+        //            }
+        //            catch {
+        //                return defaultValue;
+        //            }
+
+        //        default:
+        //            //return (T)Convert.ChangeType(obj, returnType);
+        //            object value;
+        //            return TryParse(returnType, self.ToString(), out value) ? value : defaultValue;
+        //    }
+        //}
+
+        //#endregion ToType
+    }
+}
