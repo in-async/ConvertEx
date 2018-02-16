@@ -6,27 +6,56 @@ using System.Globalization;
 namespace InAsync.Tests {
 
     [TestClass]
-    public class StringConvertTest {
+    public partial class StringConvertTest {
         private static CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
         private static CultureInfo JapaneseCulture = CultureInfo.GetCultureInfo("ja-JP");
+        private static CultureInfo CurrentCulture = CultureInfo.CurrentCulture;
 
         [TestMethod]
         public void ToOrDefault_Test() {
-            "a123".ToOrDefault<int>().Is(0);
-            "a123".ToOrDefault<int?>().Is(null);
-            "a123".ToOrDefault<decimal>().Is(0);
-            "a123".ToOrDefault<decimal?>().Is(null);
-            "a123".ToOrDefault<DateTimeKind>().Is(default(DateTimeKind));
-            "a123".ToOrDefault<DateTime>().Is(default(DateTime));
-            "a123".ToOrDefault<DateTime?>().Is(null);
-            "a123".ToOrDefault<Guid>().Is(default(Guid));
-            "a123".ToOrDefault<Guid?>().Is(null);
-            "a123".ToOrDefault<string>().Is("a123");
-            "a123".ToOrDefault<Uri>().Is(null);
+            "123.45".ToOrDefault<int>().Is(0);
+            "123.45".ToOrDefault<int>(1).Is(1);
+            "123.45".ToOrDefault<float>().Is(123.45f);
         }
 
         [TestMethod]
-        public void TryParse_Test() {
+        public void TryParse_T_input_result_Test() {
+            try {
+                CultureInfo.CurrentCulture = InvariantCulture;
+                { (StringConvert.TryParse<float>("+∞", out var result), result).Is((false, 0)); }
+
+                CultureInfo.CurrentCulture = JapaneseCulture;
+                { (StringConvert.TryParse<float>("+∞", out var result), result).Is((true, float.PositiveInfinity)); }
+            }
+            finally {
+                CultureInfo.CurrentCulture = CurrentCulture;
+            }
+        }
+
+        [TestMethod]
+        public void TryParse_T_input_provider_result_Test() {
+            { (StringConvert.TryParse<int>("123.45", null, out var result), result).Is((false, 0)); }
+            { (StringConvert.TryParse<float>("123.45", null, out var result), result).Is((true, 123.45f)); }
+            { (StringConvert.TryParse<int>("123.45", InvariantCulture, out var result), result).Is((false, 0)); }
+            { (StringConvert.TryParse<float>("123.45", InvariantCulture, out var result), result).Is((true, 123.45f)); }
+        }
+
+        [TestMethod]
+        public void TryParse_input_conversionType_result_Test() {
+            try {
+                CultureInfo.CurrentCulture = InvariantCulture;
+                { (StringConvert.TryParse("+∞", typeof(float), out var result), result).Is((false, null)); }
+
+                CultureInfo.CurrentCulture = JapaneseCulture;
+                { (StringConvert.TryParse("+∞", typeof(float), out var result), result).Is((true, float.PositiveInfinity)); }
+            }
+            finally {
+                CultureInfo.CurrentCulture = CurrentCulture;
+            }
+        }
+
+        [TestMethod]
+        public void TryParse_input_conversionType_provider_result_Test() {
             foreach (var item in TryParse_TestDataSource) {
                 StringConvert.TryParse(item.input, item.conversionType, item.provider, out var actual).Is(item.expectedSuccess, new { item, actual }.ToString());
                 actual.Is(item.expectedResult, item.ToString());
