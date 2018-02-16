@@ -6,8 +6,6 @@ namespace InAsync {
 
     public static partial class StringConvert {
 
-        #region Hex String
-
         /// <summary>
         /// byte 配列を 16 進文字列に変換します。
         /// </summary>
@@ -62,7 +60,5 @@ namespace InAsync {
             }
             return bin;
         }
-
-        #endregion Hex String
     }
 }

@@ -7,8 +7,6 @@ namespace InAsync {
 
     public static partial class StringConvert {
 
-        #region ComputeHash
-
         /// <summary>
         /// 文字列の MD5 ハッシュ値を算出します。
         /// </summary>
@@ -55,7 +53,5 @@ namespace InAsync {
             encoding = encoding ?? Encoding.UTF8;
             return algorithm.ComputeHash(encoding.GetBytes(message));
         }
-
-        #endregion ComputeHash
     }
 }

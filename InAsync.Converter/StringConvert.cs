@@ -6,9 +6,30 @@ using System.Globalization;
 
 namespace InAsync {
 
+    /// <summary>
+    /// 文字列を任意の型へ変換するクラス。
+    /// </summary>
+    /// <remarks>
+    /// 変換先としてサポートする型は以下の通りです。
+    /// - byte / sbyte
+    /// - short / ushort
+    /// - int / uint
+    /// - long / ulong
+    /// - float
+    /// - double
+    /// - decimal
+    /// - bool
+    /// - char
+    /// - DateTime
+    /// - TimeSpan
+    /// - Enum
+    /// - Guid
+    /// - string
+    /// - Version
+    /// - Uri
+    /// - 文字列からの変換をサポートしている TypeConverter を持つ型
+    /// </remarks>
     public static partial class StringConvert {
-
-        #region TryParse
 
         private static readonly IReadOnlyDictionary<Type, Func<string, Type, IFormatProvider, (bool Success, object Result)>> _tryParsers = new Dictionary<Type, Func<string, Type, IFormatProvider, (bool, object)>> {
             [typeof(byte)] = (value, conversionType, provider) => (byte.TryParse(value, NumberStyles.Integer, provider, out var tmp), (object)tmp),
@@ -44,9 +65,9 @@ namespace InAsync {
         /// <summary>
         /// 文字列を指定された型に変換します。
         /// </summary>
-        /// <typeparam name="T">変換後の型</typeparam>
-        /// <param name="input">入力文字列</param>
-        /// <param name="defaultValue">変換に失敗した場合の既定値</param>
+        /// <typeparam name="T">変換後の型。</typeparam>
+        /// <param name="input">入力文字列。</param>
+        /// <param name="defaultValue">変換に失敗した場合の既定値。</param>
         /// <returns></returns>
         public static T ToOrDefault<T>(this string input, T defaultValue = default(T))
             => TryParse<T>(input, out var result) ? result : defaultValue;
@@ -54,8 +75,8 @@ namespace InAsync {
         /// <summary>
         /// 文字列を指定された型に変換します。
         /// </summary>
-        /// <typeparam name="T">変換後の型</typeparam>
-        /// <param name="input">入力文字列</param>
+        /// <typeparam name="T">変換後の型。</typeparam>
+        /// <param name="input">入力文字列。</param>
         /// <param name="result"></param>
         /// <returns></returns>
         public static bool TryParse<T>(string input, out T result)
@@ -64,8 +85,8 @@ namespace InAsync {
         /// <summary>
         /// 文字列を指定された型に変換します。
         /// </summary>
-        /// <typeparam name="T">変換後の型</typeparam>
-        /// <param name="input">入力文字列</param>
+        /// <typeparam name="T">変換後の型。</typeparam>
+        /// <param name="input">入力文字列。</param>
         /// <param name="provider"></param>
         /// <param name="result"></param>
         /// <returns></returns>
@@ -83,8 +104,8 @@ namespace InAsync {
         /// <summary>
         /// 文字列を指定された型に変換します。
         /// </summary>
-        /// <param name="conversionType">変換後の型</param>
-        /// <param name="input">入力文字列</param>
+        /// <param name="input">入力文字列。</param>
+        /// <param name="conversionType">変換後の型。</param>
         /// <param name="result"></param>
         /// <returns></returns>
         public static bool TryParse(string input, Type conversionType, out object result)
@@ -93,8 +114,8 @@ namespace InAsync {
         /// <summary>
         /// 文字列を指定された型に変換します。
         /// </summary>
-        /// <param name="conversionType">変換後の型</param>
-        /// <param name="input">入力文字列</param>
+        /// <param name="input">入力文字列。</param>
+        /// <param name="conversionType">変換後の型。</param>
         /// <param name="provider"></param>
         /// <param name="result"></param>
         /// <returns></returns>
@@ -103,17 +124,19 @@ namespace InAsync {
             Contract.Ensures(Contract.Result<bool>() || Contract.ValueAtReturn(out result) == null);
             Contract.EndContractBlock();
 
+            // 変換先が Nullable なら、その基になる型を実際の変換先とする。
             var simpleType = Nullable.GetUnderlyingType(conversionType);
             if (simpleType != null) {
                 conversionType = simpleType;
             }
 
+            // 入力が null の場合、変換先が null を許容するか否かを戻り値とする。
             if (input == null) {
                 result = null;
                 return conversionType.IsValueType == false || simpleType != null;
             }
 
-            // 辞書から変換関数を検索して変換
+            // 辞書から変換関数を検索して変換。
             if (_tryParsers.TryGetValue(conversionType.IsEnum ? typeof(Enum) : conversionType, out var parser)) {
                 var parsed = parser(input, conversionType, provider);
                 if (parsed.Success) {
@@ -126,8 +149,8 @@ namespace InAsync {
                 }
             }
 
-            // TypeConverter で変換
-            // ※ 同じ型の TryParse と挙動が一致しない事もあるので留意する事
+            // TypeConverter で変換。
+            // ※ 同じ型の TryParse と挙動が一致しない事もあるので留意する事。
             var converter = TypeDescriptor.GetConverter(conversionType);
             if (converter.CanConvertFrom(typeof(string))) {
                 var culture = provider as CultureInfo ?? CultureInfo.CurrentCulture;
@@ -160,7 +183,5 @@ namespace InAsync {
             result = null;
             return false;
         }
-
-        #endregion TryParse
     }
 }
