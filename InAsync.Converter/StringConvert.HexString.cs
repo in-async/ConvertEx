@@ -13,12 +13,12 @@ namespace InAsync {
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static string ToHexString(this byte[] data, StringCase stringCase = StringCase.Lower) {
+        public static string ToHexString(this byte[] data, bool toLowerCase = true) {
             if (data == null) throw new ArgumentNullException(nameof(data));
             Contract.Ensures(Contract.Result<string>() != null);
             Contract.Ensures(Contract.Result<String>().Length == data.Length * 2);
 
-            string format = stringCase == StringCase.Lower ? "x2" : "X2";
+            string format = toLowerCase ? "x2" : "X2";
             var chars = new Char[data.Length * 2];
             for (int i = 0, ci = 0; i < data.Length; i++, ci += 2) {
                 var str = data[i].ToString(format, CultureInfo.InvariantCulture.NumberFormat);
@@ -61,11 +61,6 @@ namespace InAsync {
                 bin[i] = Convert.ToByte(hexString.Substring(i * 2, 2), 16);
             }
             return bin;
-        }
-
-        public enum StringCase {
-            Lower = 0,
-            Upper = 1,
         }
 
         #endregion Hex String

@@ -29,15 +29,15 @@ namespace InAsync {
             [typeof(Enum)] = (value, conversionType, provider) => {
                 // HACK 暫定
                 try {
-                    return (true, Enum.Parse(conversionType, value));
+                    return (true, Enum.Parse(conversionType, value, ignoreCase: true));
                 }
                 catch (Exception ex) when (ex is ArgumentException || ex is OverflowException) {
                     return (false, (object)null);
                 }
             },
             [typeof(Guid)] = (value, conversionType, provider) => (Guid.TryParse(value, out var tmp), (object)tmp),
-            [typeof(Version)] = (value, conversionType, provider) => (Version.TryParse(value, out var tmp), (object)tmp),
             [typeof(string)] = (value, conversionType, provider) => (true, (object)value),
+            [typeof(Version)] = (value, conversionType, provider) => (Version.TryParse(value, out var tmp), (object)tmp),
             [typeof(Uri)] = (value, conversionType, provider) => (Uri.TryCreate(value, UriKind.Absolute, out var tmp), (object)tmp),
         };
 
@@ -70,8 +70,8 @@ namespace InAsync {
         /// <param name="result"></param>
         /// <returns></returns>
         public static bool TryParse<T>(string input, IFormatProvider provider, out T result) {
-            if (TryParse(typeof(T), input, provider, out var resultObj)) {
-                result = (resultObj != null) ? (T)resultObj : default(T);
+            if (TryParse(input, typeof(T), provider, out var resultObj)) {
+                result = (T)resultObj;
                 return true;
             }
             else {
@@ -87,8 +87,8 @@ namespace InAsync {
         /// <param name="input">入力文字列</param>
         /// <param name="result"></param>
         /// <returns></returns>
-        public static bool TryParse(Type conversionType, string input, out object result)
-            => TryParse(conversionType, input, CultureInfo.CurrentCulture, out result);
+        public static bool TryParse(string input, Type conversionType, out object result)
+            => TryParse(input, conversionType, CultureInfo.CurrentCulture, out result);
 
         /// <summary>
         /// 文字列を指定された型に変換します。
@@ -98,7 +98,7 @@ namespace InAsync {
         /// <param name="provider"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        public static bool TryParse(Type conversionType, string input, IFormatProvider provider, out object result) {
+        public static bool TryParse(string input, Type conversionType, IFormatProvider provider, out object result) {
             if (conversionType == null) throw new ArgumentNullException(nameof(conversionType));
             Contract.Ensures(Contract.Result<bool>() || Contract.ValueAtReturn(out result) == null);
             Contract.EndContractBlock();
@@ -114,7 +114,7 @@ namespace InAsync {
             }
 
             // 辞書から変換関数を検索して変換
-            if (_tryParsers.TryGetValue(conversionType, out var parser)) {
+            if (_tryParsers.TryGetValue(conversionType.IsEnum ? typeof(Enum) : conversionType, out var parser)) {
                 var parsed = parser(input, conversionType, provider);
                 if (parsed.Success) {
                     result = parsed.Result;
@@ -130,8 +130,10 @@ namespace InAsync {
             // ※ 同じ型の TryParse と挙動が一致しない事もあるので留意する事
             var converter = TypeDescriptor.GetConverter(conversionType);
             if (converter.CanConvertFrom(typeof(string))) {
+                var culture = provider as CultureInfo ?? CultureInfo.CurrentCulture;
+
                 try {
-                    result = converter.ConvertFrom(input);
+                    result = converter.ConvertFrom(null, culture, input);
                     return true;
                 }
                 catch {
@@ -160,77 +162,5 @@ namespace InAsync {
         }
 
         #endregion TryParse
-
-        //#region ToType
-
-        ///// <summary>
-        ///// オブジェクトを任意の型に変換します。
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <param name="self"></param>
-        ///// <param name="defaultValue"></param>
-        ///// <returns></returns>
-        //public static T To<T>(this object self, T defaultValue = default(T)) {
-        //    var result = ToType(self, typeof(T), defaultValue);
-        //    return (result != null) ? (T)result : defaultValue;
-        //}
-
-        ///// <summary>
-        ///// オブジェクトを任意の型に変換します。
-        ///// </summary>
-        ///// <param name="self"></param>
-        ///// <param name="returnType"></param>
-        ///// <param name="defaultValue"></param>
-        ///// <returns></returns>
-        //public static object ToType(this object self, Type returnType, object defaultValue = null) {
-        //    if (returnType == null) throw new ArgumentNullException(nameof(returnType));
-        //    Contract.EndContractBlock();
-
-        //    if (self == null) {
-        //        return defaultValue;
-        //    }
-        //    if (DBNull.Value.Equals(self)) {
-        //        return defaultValue;
-        //    }
-
-        //    var inputType = self.GetType();
-        //    if (inputType == returnType) {
-        //        return self;
-        //    }
-
-        //    // T が nullable の場合の処理
-        //    var underlyingType = Nullable.GetUnderlyingType(returnType);
-        //    if (underlyingType != null) {
-        //        returnType = underlyingType;
-        //        if (inputType == returnType) {
-        //            return self;
-        //        }
-        //    }
-
-        //    switch (Type.GetTypeCode(returnType)) {
-        //        case TypeCode.Empty:
-        //        case TypeCode.Object:
-        //            var tc = TypeDescriptor.GetConverter(returnType);
-        //            if (tc.CanConvertFrom(inputType) == false) {
-        //                return defaultValue;
-        //            }
-
-        //            // TODO: ここで生じる Exception を例外処理を伴わずに処理したい。
-        //            // TypeConverter.IsValid メソッドでは、.NET 4.0 以降、内部で ConvertFrom コールを catch しているだけなので使えない。
-        //            try {
-        //                return tc.ConvertFrom(self);
-        //            }
-        //            catch {
-        //                return defaultValue;
-        //            }
-
-        //        default:
-        //            //return (T)Convert.ChangeType(obj, returnType);
-        //            object value;
-        //            return TryParse(returnType, self.ToString(), out value) ? value : defaultValue;
-        //    }
-        //}
-
-        //#endregion ToType
     }
 }
