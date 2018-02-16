@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace InAsync.Tests {
 
     [TestClass]
-    public class ConvertExTest {
+    public class StringConvertTest {
 
         [TestMethod]
         public void ToOrDefault_Test() {
@@ -25,7 +25,7 @@ namespace InAsync.Tests {
         [TestMethod]
         public void TryParse_Test() {
             foreach (var item in TestDataSource) {
-                ConvertEx.TryParse(item.conversionType, item.input, out var actual).Is(item.expectedSuccess, new { item, actual }.ToString());
+                StringConvert.TryParse(item.conversionType, item.input, out var actual).Is(item.expectedSuccess, new { item, actual }.ToString());
                 actual.Is(item.expectedResult, item.ToString());
             }
         }

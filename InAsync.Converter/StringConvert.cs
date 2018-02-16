@@ -6,7 +6,7 @@ using System.Globalization;
 
 namespace InAsync {
 
-    public static partial class ConvertEx {
+    public static partial class StringConvert {
 
         #region TryParse
 

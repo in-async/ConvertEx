@@ -5,7 +5,7 @@ using System.Text;
 
 namespace InAsync {
 
-    public static partial class ConvertEx {
+    public static partial class StringConvert {
 
         #region ComputeHash
 
