@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\InAsync.Converter\InAsync.Converter.csproj" />
+    <ProjectReference Include="..\InAsync.ConvertExtra\InAsync.ConvertExtra.csproj" />
   </ItemGroup>
 
 </Project>
