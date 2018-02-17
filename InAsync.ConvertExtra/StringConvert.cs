@@ -11,23 +11,23 @@ namespace InAsync {
     /// </summary>
     /// <remarks>
     /// 変換先としてサポートする型は以下の通りです。
-    /// - byte / sbyte
-    /// - short / ushort
-    /// - int / uint
-    /// - long / ulong
-    /// - float
-    /// - double
-    /// - decimal
-    /// - bool
-    /// - char
-    /// - DateTime
-    /// - TimeSpan
-    /// - Enum
-    /// - Guid
-    /// - string
-    /// - Version
-    /// - Uri
-    /// - 文字列からの変換をサポートしている TypeConverter を持つ型
+    /// - <c>Byte</c> / <c>SByte</c>
+    /// - <c>Int16</c> / <c>UInt16</c>
+    /// - <c>Int32</c> / <c>UInt32</c>
+    /// - <c>Int64</c> / <c>UInt64</c>
+    /// - <c>Single</c>
+    /// - <c>Double</c>
+    /// - <c>Decimal</c>
+    /// - <c>Boolean</c>
+    /// - <c>Char</c>
+    /// - <c>DateTime</c>
+    /// - <c>TimeSpan</c>
+    /// - <c>Enum</c>
+    /// - <c>Guid</c>
+    /// - <c>String</c>
+    /// - <c>Version</c>
+    /// - <c>Uri</c>
+    /// - 文字列からの変換をサポートしている <see cref="TypeConverter"/> を持つ型
     /// </remarks>
     public static partial class StringConvert {
 
@@ -63,33 +63,33 @@ namespace InAsync {
         };
 
         /// <summary>
-        /// 文字列を指定された型に変換します。
+        /// 文字列を <typeparamref name="T"/> の型に変換します。
         /// </summary>
         /// <typeparam name="T">変換後の型。</typeparam>
         /// <param name="input">入力文字列。</param>
-        /// <param name="defaultValue">変換に失敗した場合の既定値。</param>
-        /// <returns></returns>
+        /// <param name="defaultValue">変換に失敗した際に返す値。</param>
+        /// <returns>変換に成功すれば変換後の値、それ以外なら <paramref name="defaultValue"/>。</returns>
         public static T ToOrDefault<T>(this string input, T defaultValue = default(T))
             => TryParse<T>(input, out var result) ? result : defaultValue;
 
         /// <summary>
-        /// 文字列を指定された型に変換します。
+        /// 文字列を <typeparamref name="T"/> の型に変換します。
         /// </summary>
         /// <typeparam name="T">変換後の型。</typeparam>
         /// <param name="input">入力文字列。</param>
-        /// <param name="result"></param>
-        /// <returns></returns>
+        /// <param name="result">変換に成功すれば変換後の値、それ以外なら <typeparamref name="T"/> の既定値が返されます。</param>
+        /// <returns>変換に成功すれば <c>true</c>、それ以外なら <c>false</c>。</returns>
         public static bool TryParse<T>(string input, out T result)
             => TryParse<T>(input, CultureInfo.CurrentCulture, out result);
 
         /// <summary>
-        /// 文字列を指定された型に変換します。
+        /// 文字列を <typeparamref name="T"/> の型に変換します。
         /// </summary>
         /// <typeparam name="T">変換後の型。</typeparam>
         /// <param name="input">入力文字列。</param>
-        /// <param name="provider"></param>
-        /// <param name="result"></param>
-        /// <returns></returns>
+        /// <param name="provider">カルチャ固有の書式情報。<c>null</c> の場合は現在のカルチャが使用されます。</param>
+        /// <param name="result">変換に成功すれば変換後の値、それ以外なら <typeparamref name="T"/> の既定値が返されます。</param>
+        /// <returns>変換に成功すれば <c>true</c>、それ以外なら <c>false</c>。</returns>
         public static bool TryParse<T>(string input, IFormatProvider provider, out T result) {
             if (TryParse(input, typeof(T), provider, out var resultObj)) {
                 result = (T)resultObj;
@@ -102,23 +102,25 @@ namespace InAsync {
         }
 
         /// <summary>
-        /// 文字列を指定された型に変換します。
+        /// 文字列を <paramref name="conversionType"/> の型に変換します。
         /// </summary>
         /// <param name="input">入力文字列。</param>
         /// <param name="conversionType">変換後の型。</param>
-        /// <param name="result"></param>
-        /// <returns></returns>
+        /// <param name="result">変換に成功すれば変換後の値、それ以外なら <c>null</c> が返されます。</param>
+        /// <returns>変換に成功すれば <c>true</c>、それ以外なら <c>false</c>。</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="conversionType"/> が <c>null</c> の場合に投げられます。</exception>
         public static bool TryParse(string input, Type conversionType, out object result)
             => TryParse(input, conversionType, CultureInfo.CurrentCulture, out result);
 
         /// <summary>
-        /// 文字列を指定された型に変換します。
+        /// 文字列を <paramref name="conversionType"/> の型に変換します。
         /// </summary>
         /// <param name="input">入力文字列。</param>
         /// <param name="conversionType">変換後の型。</param>
-        /// <param name="provider"></param>
-        /// <param name="result"></param>
-        /// <returns></returns>
+        /// <param name="provider">カルチャ固有の書式情報。<c>null</c> の場合は現在のカルチャが使用されます。</param>
+        /// <param name="result">変換に成功すれば変換後の値、それ以外なら <c>null</c> が返されます。</param>
+        /// <returns>変換に成功すれば <c>true</c>、それ以外なら <c>false</c>。</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="conversionType"/> が <c>null</c> の場合に投げられます。</exception>
         public static bool TryParse(string input, Type conversionType, IFormatProvider provider, out object result) {
             if (conversionType == null) throw new ArgumentNullException(nameof(conversionType));
             Contract.Ensures(Contract.Result<bool>() || Contract.ValueAtReturn(out result) == null);
