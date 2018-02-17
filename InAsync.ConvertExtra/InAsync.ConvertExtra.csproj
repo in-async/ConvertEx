@@ -1,11 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net45;netcoreapp2.0</TargetFrameworks>
     <RootNamespace>InAsync</RootNamespace>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Authors>inasync</Authors>
+    <Company />
+    <Copyright>Copyright 2018</Copyright>
+    <PackageLicenseUrl>https://github.com/in-async/ConvertExtra/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/in-async/ConvertExtra</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/in-async/ConvertExtra</RepositoryUrl>
+    <Description>String to Any Object Converter.</Description>
+    <PackageTags>Converter</PackageTags>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
 
