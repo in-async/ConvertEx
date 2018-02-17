@@ -8,8 +8,15 @@ namespace InAsync.Tests {
     [TestClass]
     public partial class StringConvertTest {
         private static CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
-        private static CultureInfo JapaneseCulture = CultureInfo.GetCultureInfo("ja-JP");
         private static CultureInfo CurrentCulture = CultureInfo.CurrentCulture;
+
+        private static CultureInfo StubJPCulture = ((Func<CultureInfo>)(() => {
+            var stubCulture = new CultureInfo("ja-JP");
+            stubCulture.NumberFormat.PositiveInfinitySymbol = "+∞";
+            stubCulture.NumberFormat.NegativeInfinitySymbol = "-∞";
+            stubCulture.NumberFormat.NaNSymbol = "NaN (非数値)";
+            return stubCulture;
+        }))();
 
         [TestMethod]
         public void ToOrDefault_Test() {
@@ -22,10 +29,10 @@ namespace InAsync.Tests {
         public void TryParse_T_input_result_Test() {
             try {
                 CultureInfo.CurrentCulture = InvariantCulture;
-                { (StringConvert.TryParse<float>("+∞", out var result), result).Is((false, 0)); }
+                { (StringConvert.TryParse<float>("-Infinity", out var result), result).Is((true, float.NegativeInfinity)); }
 
-                CultureInfo.CurrentCulture = JapaneseCulture;
-                { (StringConvert.TryParse<float>("+∞", out var result), result).Is((true, float.PositiveInfinity)); }
+                CultureInfo.CurrentCulture = StubJPCulture;
+                { (StringConvert.TryParse<float>("-Infinity", out var result), result).Is((false, 0)); }
             }
             finally {
                 CultureInfo.CurrentCulture = CurrentCulture;
@@ -44,10 +51,10 @@ namespace InAsync.Tests {
         public void TryParse_input_conversionType_result_Test() {
             try {
                 CultureInfo.CurrentCulture = InvariantCulture;
-                { (StringConvert.TryParse("+∞", typeof(float), out var result), result).Is((false, null)); }
+                { (StringConvert.TryParse("-Infinity", typeof(float), out var result), result).Is((true, float.NegativeInfinity)); }
 
-                CultureInfo.CurrentCulture = JapaneseCulture;
-                { (StringConvert.TryParse("+∞", typeof(float), out var result), result).Is((true, float.PositiveInfinity)); }
+                CultureInfo.CurrentCulture = StubJPCulture;
+                { (StringConvert.TryParse("-Infinity", typeof(float), out var result), result).Is((false, null)); }
             }
             finally {
                 CultureInfo.CurrentCulture = CurrentCulture;
@@ -299,14 +306,22 @@ namespace InAsync.Tests {
             ("1,234"                  , typeof(float), InvariantCulture, true , (float)1234),
             ("1,234.56"               , typeof(float), InvariantCulture, true , (float)1234.56),
             (null                     , typeof(float), InvariantCulture, false, null),
+            ("-Infinity"              , typeof(float), InvariantCulture, true , float.NegativeInfinity),
+            ("+Infinity"              , typeof(float), InvariantCulture, false, null),
+            ("Infinity"               , typeof(float), InvariantCulture, true , float.PositiveInfinity),
+            ("NaN"                    , typeof(float), InvariantCulture, true , float.NaN),
+            ("-Infinity"              , typeof(float), StubJPCulture   , false, null),
+            ("+Infinity"              , typeof(float), StubJPCulture   , false, null),
+            ("Infinity"               , typeof(float), StubJPCulture   , false, null),
+            ("NaN"                    , typeof(float), StubJPCulture   , false, null),
             ("-∞"                    , typeof(float), InvariantCulture, false, null),
             ("+∞"                    , typeof(float), InvariantCulture, false, null),
             ("∞"                     , typeof(float), InvariantCulture, false, null),
             ("NaN (非数値)"           , typeof(float), InvariantCulture, false, null),
-            ("-∞"                    , typeof(float), JapaneseCulture , true , float.NegativeInfinity),
-            ("+∞"                    , typeof(float), JapaneseCulture , true , float.PositiveInfinity),
-            ("∞"                     , typeof(float), JapaneseCulture , false, null),
-            ("NaN (非数値)"           , typeof(float), JapaneseCulture , true , float.NaN),
+            ("-∞"                    , typeof(float), StubJPCulture   , true , float.NegativeInfinity),
+            ("+∞"                    , typeof(float), StubJPCulture   , true , float.PositiveInfinity),
+            ("∞"                     , typeof(float), StubJPCulture   , false, null),
+            ("NaN (非数値)"           , typeof(float), StubJPCulture   , true , float.NaN),
 
             // float?
             (""                       , typeof(float?), InvariantCulture, false, null),
@@ -321,14 +336,22 @@ namespace InAsync.Tests {
             ("1,234"                  , typeof(float?), InvariantCulture, true , (float)1234),
             ("1,234.56"               , typeof(float?), InvariantCulture, true , (float)1234.56),
             (null                     , typeof(float?), InvariantCulture, true , null),
+            ("-Infinity"              , typeof(float?), InvariantCulture, true , float.NegativeInfinity),
+            ("+Infinity"              , typeof(float?), InvariantCulture, false, null),
+            ("Infinity"               , typeof(float?), InvariantCulture, true , float.PositiveInfinity),
+            ("NaN"                    , typeof(float?), InvariantCulture, true , float.NaN),
+            ("-Infinity"              , typeof(float?), StubJPCulture   , false, null),
+            ("+Infinity"              , typeof(float?), StubJPCulture   , false, null),
+            ("Infinity"               , typeof(float?), StubJPCulture   , false, null),
+            ("NaN"                    , typeof(float?), StubJPCulture   , false, null),
             ("-∞"                    , typeof(float?), InvariantCulture, false, null),
             ("+∞"                    , typeof(float?), InvariantCulture, false, null),
             ("∞"                     , typeof(float?), InvariantCulture, false, null),
             ("NaN (非数値)"           , typeof(float?), InvariantCulture, false, null),
-            ("-∞"                    , typeof(float?), JapaneseCulture , true , float.NegativeInfinity),
-            ("+∞"                    , typeof(float?), JapaneseCulture , true , float.PositiveInfinity),
-            ("∞"                     , typeof(float?), JapaneseCulture , false, null),
-            ("NaN (非数値)"           , typeof(float?), JapaneseCulture , true , float.NaN),
+            ("-∞"                    , typeof(float?), StubJPCulture   , true , float.NegativeInfinity),
+            ("+∞"                    , typeof(float?), StubJPCulture   , true , float.PositiveInfinity),
+            ("∞"                     , typeof(float?), StubJPCulture   , false, null),
+            ("NaN (非数値)"           , typeof(float?), StubJPCulture   , true , float.NaN),
 
             // double
             (""                       , typeof(double), InvariantCulture, false, null),
@@ -343,14 +366,22 @@ namespace InAsync.Tests {
             ("1,234"                  , typeof(double), InvariantCulture, true , (double)1234),
             ("1,234.56"               , typeof(double), InvariantCulture, true , (double)1234.56),
             (null                     , typeof(double), InvariantCulture, false, null),
+            ("-Infinity"              , typeof(double), InvariantCulture, true , double.NegativeInfinity),
+            ("+Infinity"              , typeof(double), InvariantCulture, false, null),
+            ("Infinity"               , typeof(double), InvariantCulture, true , double.PositiveInfinity),
+            ("NaN"                    , typeof(double), InvariantCulture, true , double.NaN),
+            ("-Infinity"              , typeof(double), StubJPCulture   , false, null),
+            ("+Infinity"              , typeof(double), StubJPCulture   , false, null),
+            ("Infinity"               , typeof(double), StubJPCulture   , false, null),
+            ("NaN"                    , typeof(double), StubJPCulture   , false, null),
             ("-∞"                    , typeof(double), InvariantCulture, false, null),
             ("+∞"                    , typeof(double), InvariantCulture, false, null),
             ("∞"                     , typeof(double), InvariantCulture, false, null),
             ("NaN (非数値)"           , typeof(double), InvariantCulture, false, null),
-            ("-∞"                    , typeof(double), JapaneseCulture , true , double.NegativeInfinity),
-            ("+∞"                    , typeof(double), JapaneseCulture , true , double.PositiveInfinity),
-            ("∞"                     , typeof(double), JapaneseCulture , false, null),
-            ("NaN (非数値)"           , typeof(double), JapaneseCulture , true , double.NaN),
+            ("-∞"                    , typeof(double), StubJPCulture   , true , double.NegativeInfinity),
+            ("+∞"                    , typeof(double), StubJPCulture   , true , double.PositiveInfinity),
+            ("∞"                     , typeof(double), StubJPCulture   , false, null),
+            ("NaN (非数値)"           , typeof(double), StubJPCulture   , true , double.NaN),
 
             // double?
             (""                       , typeof(double?), InvariantCulture, false, null),
@@ -365,14 +396,22 @@ namespace InAsync.Tests {
             ("1,234"                  , typeof(double?), InvariantCulture, true , (double)1234),
             ("1,234.56"               , typeof(double?), InvariantCulture, true , (double)1234.56),
             (null                     , typeof(double?), InvariantCulture, true , null),
+            ("-Infinity"              , typeof(double?), InvariantCulture, true , double.NegativeInfinity),
+            ("+Infinity"              , typeof(double?), InvariantCulture, false, null),
+            ("Infinity"               , typeof(double?), InvariantCulture, true , double.PositiveInfinity),
+            ("NaN"                    , typeof(double?), InvariantCulture, true , double.NaN),
+            ("-Infinity"              , typeof(double?), StubJPCulture   , false, null),
+            ("+Infinity"              , typeof(double?), StubJPCulture   , false, null),
+            ("Infinity"               , typeof(double?), StubJPCulture   , false, null),
+            ("NaN"                    , typeof(double?), StubJPCulture   , false, null),
             ("-∞"                    , typeof(double?), InvariantCulture, false, null),
             ("+∞"                    , typeof(double?), InvariantCulture, false, null),
             ("∞"                     , typeof(double?), InvariantCulture, false, null),
             ("NaN (非数値)"           , typeof(double?), InvariantCulture, false, null),
-            ("-∞"                    , typeof(double?), JapaneseCulture , true , double.NegativeInfinity),
-            ("+∞"                    , typeof(double?), JapaneseCulture , true , double.PositiveInfinity),
-            ("∞"                     , typeof(double?), JapaneseCulture , false, null),
-            ("NaN (非数値)"           , typeof(double?), JapaneseCulture , true , double.NaN),
+            ("-∞"                    , typeof(double?), StubJPCulture   , true , double.NegativeInfinity),
+            ("+∞"                    , typeof(double?), StubJPCulture   , true , double.PositiveInfinity),
+            ("∞"                     , typeof(double?), StubJPCulture   , false, null),
+            ("NaN (非数値)"           , typeof(double?), StubJPCulture   , true , double.NaN),
 
             // decimal
             (""                         , typeof(decimal), InvariantCulture, false, null),
@@ -387,14 +426,22 @@ namespace InAsync.Tests {
             ("1,234"                    , typeof(decimal), InvariantCulture, true , (decimal)1234),
             ("1,234.56"                 , typeof(decimal), InvariantCulture, true , (decimal)1234.56),
             (null                       , typeof(decimal), InvariantCulture, false, null),
+            ("-Infinity"                , typeof(decimal), InvariantCulture, false, null),
+            ("+Infinity"                , typeof(decimal), InvariantCulture, false, null),
+            ("Infinity"                 , typeof(decimal), InvariantCulture, false, null),
+            ("NaN"                      , typeof(decimal), InvariantCulture, false, null),
+            ("-Infinity"                , typeof(decimal), StubJPCulture   , false, null),
+            ("+Infinity"                , typeof(decimal), StubJPCulture   , false, null),
+            ("Infinity"                 , typeof(decimal), StubJPCulture   , false, null),
+            ("NaN"                      , typeof(decimal), StubJPCulture   , false, null),
             ("-∞"                      , typeof(decimal), InvariantCulture, false, null),
             ("+∞"                      , typeof(decimal), InvariantCulture, false, null),
             ("∞"                       , typeof(decimal), InvariantCulture, false, null),
             ("NaN (非数値)"             , typeof(decimal), InvariantCulture, false, null),
-            ("-∞"                      , typeof(decimal), JapaneseCulture , false, null),
-            ("+∞"                      , typeof(decimal), JapaneseCulture , false, null),
-            ("∞"                       , typeof(decimal), JapaneseCulture , false, null),
-            ("NaN (非数値)"             , typeof(decimal), JapaneseCulture , false, null),
+            ("-∞"                      , typeof(decimal), StubJPCulture   , false, null),
+            ("+∞"                      , typeof(decimal), StubJPCulture   , false, null),
+            ("∞"                       , typeof(decimal), StubJPCulture   , false, null),
+            ("NaN (非数値)"             , typeof(decimal), StubJPCulture   , false, null),
             (decimal.Zero.ToString()    , typeof(decimal), InvariantCulture, true , decimal.Zero),
             (decimal.One.ToString()     , typeof(decimal), InvariantCulture, true , decimal.One),
             (decimal.MinusOne.ToString(), typeof(decimal), InvariantCulture, true , decimal.MinusOne),
@@ -412,14 +459,25 @@ namespace InAsync.Tests {
             ("1,234"                    , typeof(decimal?), InvariantCulture, true , (decimal)1234),
             ("1,234.56"                 , typeof(decimal?), InvariantCulture, true , (decimal)1234.56),
             (null                       , typeof(decimal?), InvariantCulture, true , null),
+            ("-Infinity"                , typeof(decimal?), InvariantCulture, false, null),
+            ("+Infinity"                , typeof(decimal?), InvariantCulture, false, null),
+            ("Infinity"                 , typeof(decimal?), InvariantCulture, false, null),
+            ("NaN"                      , typeof(decimal?), InvariantCulture, false, null),
+            ("-Infinity"                , typeof(decimal?), StubJPCulture       , false, null),
+            ("+Infinity"                , typeof(decimal?), StubJPCulture       , false, null),
+            ("Infinity"                 , typeof(decimal?), StubJPCulture       , false, null),
+            ("NaN"                      , typeof(decimal?), StubJPCulture       , false, null),
             ("-∞"                      , typeof(decimal?), InvariantCulture, false, null),
             ("+∞"                      , typeof(decimal?), InvariantCulture, false, null),
             ("∞"                       , typeof(decimal?), InvariantCulture, false, null),
             ("NaN (非数値)"             , typeof(decimal?), InvariantCulture, false, null),
-            ("-∞"                      , typeof(decimal?), JapaneseCulture , false, null),
-            ("+∞"                      , typeof(decimal?), JapaneseCulture , false, null),
-            ("∞"                       , typeof(decimal?), JapaneseCulture , false, null),
-            ("NaN (非数値)"             , typeof(decimal?), JapaneseCulture , false, null),
+            ("-∞"                      , typeof(decimal?), StubJPCulture   , false, null),
+            ("+∞"                      , typeof(decimal?), StubJPCulture   , false, null),
+            ("∞"                       , typeof(decimal?), StubJPCulture   , false, null),
+            ("NaN (非数値)"             , typeof(decimal?), StubJPCulture   , false, null),
+            (decimal.Zero.ToString()    , typeof(decimal?), InvariantCulture, true , decimal.Zero),
+            (decimal.One.ToString()     , typeof(decimal?), InvariantCulture, true , decimal.One),
+            (decimal.MinusOne.ToString(), typeof(decimal?), InvariantCulture, true , decimal.MinusOne),
 
             // bool
             (""         , typeof(bool), InvariantCulture, false, null),
@@ -473,7 +531,7 @@ namespace InAsync.Tests {
             ("a"                     , typeof(char), InvariantCulture, true , 'a'),
             ("ab"                    , typeof(char), InvariantCulture, false, null),
             ("あ"                    , typeof(char), InvariantCulture, true , 'あ'),
-            ("あ"                    , typeof(char), JapaneseCulture , true , 'あ'),
+            ("あ"                    , typeof(char), StubJPCulture , true , 'あ'),
 
             // char?
             (""                      , typeof(char?), InvariantCulture, false, null),
@@ -491,7 +549,7 @@ namespace InAsync.Tests {
             ("a"                     , typeof(char?), InvariantCulture, true , 'a'),
             ("ab"                    , typeof(char?), InvariantCulture, false, null),
             ("あ"                    , typeof(char?), InvariantCulture, true , 'あ'),
-            ("あ"                    , typeof(char?), JapaneseCulture , true , 'あ'),
+            ("あ"                    , typeof(char?), StubJPCulture , true , 'あ'),
 
             // DateTime
             (""                          , typeof(DateTime), InvariantCulture, false, null),

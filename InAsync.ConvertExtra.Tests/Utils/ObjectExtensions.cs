@@ -12,11 +12,11 @@ namespace Microsoft.VisualStudio.TestTools.UnitTesting {
                 return;
             }
 
-            Assert.AreEqual(expected, actual, $"{new { actual, expected }}\n{error}");
+            Assert.AreEqual(expected, actual, $"{new { expected, actual }}\n{error}");
         }
 
         public static void Is<T>(this IEnumerable<T> actual, IEnumerable<T> expected, object error = null) {
-            CollectionAssert.AreEqual(expected.ToList(), actual.ToList(), $"{new { actual, expected }}\n{error}");
+            CollectionAssert.AreEqual(expected.ToList(), actual.ToList(), $"{new { expected, actual }}\n{error}");
         }
     }
 }
