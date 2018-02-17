@@ -10,16 +10,18 @@ namespace InAsync {
         /// byte 配列を 16 進文字列に変換します。
         /// </summary>
         /// <param name="data"></param>
+        /// <param name="toUpper"></param>
         /// <returns></returns>
-        public static string ToHexString(this byte[] data, bool toLowerCase = true) {
+        public static string ToHexString(this byte[] data, bool toUpper = false) {
             if (data == null) throw new ArgumentNullException(nameof(data));
             Contract.Ensures(Contract.Result<string>() != null);
             Contract.Ensures(Contract.Result<String>().Length == data.Length * 2);
 
-            string format = toLowerCase ? "x2" : "X2";
+            var format = toUpper ? "X2" : "x2";
+            var numberFormatInfo = CultureInfo.InvariantCulture.NumberFormat;
             var chars = new Char[data.Length * 2];
             for (int i = 0, ci = 0; i < data.Length; i++, ci += 2) {
-                var str = data[i].ToString(format, CultureInfo.InvariantCulture.NumberFormat);
+                var str = data[i].ToString(format, numberFormatInfo);
                 Contract.Assume(str.Length == 2);
 
                 chars[ci] = str[0];

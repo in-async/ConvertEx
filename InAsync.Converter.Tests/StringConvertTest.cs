@@ -57,8 +57,7 @@ namespace InAsync.Tests {
         [TestMethod]
         public void TryParse_input_conversionType_provider_result_Test() {
             foreach (var item in TryParse_TestDataSource) {
-                StringConvert.TryParse(item.input, item.conversionType, item.provider, out var actual).Is(item.expectedSuccess, new { item, actual }.ToString());
-                actual.Is(item.expectedResult, item.ToString());
+                (StringConvert.TryParse(item.input, item.conversionType, item.provider, out var actual), actual).Is((item.expectedSuccess, item.expectedResult));
             }
         }
 
