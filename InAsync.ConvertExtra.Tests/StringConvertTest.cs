@@ -19,10 +19,10 @@ namespace InAsync.Tests {
         }))();
 
         [TestMethod]
-        public void ToOrDefault_Test() {
-            "123.45".ToOrDefault<int>().Is(0);
-            "123.45".ToOrDefault<int>(1).Is(1);
-            "123.45".ToOrDefault<float>().Is(123.45f);
+        public void To_Test() {
+            "123.45".To<int>().Is(0);
+            "123.45".To<int>(1).Is(1);
+            "123.45".To<float>().Is(123.45f);
         }
 
         [TestMethod]

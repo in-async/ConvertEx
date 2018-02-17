@@ -69,7 +69,7 @@ namespace InAsync {
         /// <param name="input">入力文字列。</param>
         /// <param name="defaultValue">変換に失敗した際に返す値。</param>
         /// <returns>変換に成功すれば変換後の値、それ以外なら <paramref name="defaultValue"/>。</returns>
-        public static T ToOrDefault<T>(this string input, T defaultValue = default(T))
+        public static T To<T>(this string input, T defaultValue = default(T))
             => TryParse<T>(input, out var result) ? result : defaultValue;
 
         /// <summary>
