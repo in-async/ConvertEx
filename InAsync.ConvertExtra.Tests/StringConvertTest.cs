@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace InAsync.Tests {
 
@@ -827,5 +828,32 @@ namespace InAsync.Tests {
 
         private class Foo {
         }
+
+        [TestMethod]
+        public void Bench_StringConvert_TryParse() {
+            //for (var i = 0; i < 1000; i++) {
+            //    foreach (var item in TryParse_TestDataSource) {
+            //        StringConvert.NativeTryParse<int>(item.input, null, out _);
+            //    }
+            //}
+            foreach (var input in TryParse_BenchData) {
+                StringConvert.TryParse<int>(input, out _);
+            }
+        }
+
+        [TestMethod]
+        public void Bench_Int32_TryParse() {
+            //for (var i = 0; i < 1000; i++) {
+            //    foreach (var item in TryParse_TestDataSource) {
+            //        Int32.TryParse(item.input, out _);
+            //    }
+            //}
+            foreach (var input in TryParse_BenchData) {
+                //Enum.TryParse<TestIntEnum>(input, out _);
+                Int32.TryParse(input, out _);
+            }
+        }
+
+        private static string[] TryParse_BenchData = Enumerable.Range(0, 500000).Select(i => i.ToString()).ToArray();
     }
 }
