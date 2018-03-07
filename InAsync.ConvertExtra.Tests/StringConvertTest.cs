@@ -1,3 +1,4 @@
+using InAsync.ConvertExtra.TryParsers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -65,11 +66,11 @@ namespace InAsync.Tests {
         [TestMethod]
         public void TryParse_input_conversionType_provider_result_Test() {
             foreach (var item in TryParse_TestDataSource) {
-                (StringConvert.TryParse(item.input, item.conversionType, item.provider, out var actual), actual).Is((item.expectedSuccess, item.expectedResult));
+                (StringConvert.TryParse(item.input, item.conversionType, item.provider, out var actual), actual).Is((item.expectedSuccess, item.expectedResult), item);
             }
         }
 
-        private static IEnumerable<(string input, Type conversionType, IFormatProvider provider, bool expectedSuccess, object expectedResult)> TryParse_TestDataSource = new(string, Type, IFormatProvider, bool, object)[]{
+        private static IEnumerable<(string input, Type conversionType, IFormatProvider provider, bool expectedSuccess, object expectedResult)> TryParse_TestDataSource = new(string input, Type conversionType, IFormatProvider provider, bool expectedSuccess, object expectedResult)[]{
             // byte
             (""                      , typeof(byte), InvariantCulture, false, null),
             ("0"                     , typeof(byte), InvariantCulture, true , (byte)0),
@@ -775,7 +776,7 @@ namespace InAsync.Tests {
             ("0x10"                   , typeof(Version), InvariantCulture, false, null),
             ("1,234"                  , typeof(Version), InvariantCulture, false, null),
             ("1,234.56"               , typeof(Version), InvariantCulture, false, null),
-            (null                     , typeof(Version), InvariantCulture, true , null),
+            (null                     , typeof(Version), InvariantCulture, false, null),
             ("0.0"                    , typeof(Version), InvariantCulture, true , new Version(0, 0)),
             ("0.0"                    , typeof(Version), null            , true , new Version(0, 0)),
             ("0.0.0"                  , typeof(Version), InvariantCulture, true , new Version(0, 0, 0)),
@@ -795,7 +796,7 @@ namespace InAsync.Tests {
             ("0x10"                         , typeof(Uri), InvariantCulture, false, null),
             ("1,234"                        , typeof(Uri), InvariantCulture, false, null),
             ("1,234.56"                     , typeof(Uri), InvariantCulture, false, null),
-            (null                           , typeof(Uri), InvariantCulture, true , null),
+            (null                           , typeof(Uri), InvariantCulture, false, null),
             ("http://example.com"           , typeof(Uri), InvariantCulture, true, new Uri("http://example.com/")),
             ("http://example.com"           , typeof(Uri), null            , true, new Uri("http://example.com/")),
             ("\t\n http://example.com \t\n ", typeof(Uri), InvariantCulture, true, new Uri("http://example.com/")),
@@ -811,7 +812,7 @@ namespace InAsync.Tests {
             ("0x10"                         , typeof(Foo), InvariantCulture, false, null),
             ("1,234"                        , typeof(Foo), InvariantCulture, false, null),
             ("1,234.56"                     , typeof(Foo), InvariantCulture, false, null),
-            (null                           , typeof(Foo), InvariantCulture, true , null),
+            (null                           , typeof(Foo), InvariantCulture, false, null),
         };
 
         private enum TestByteEnum : byte {
@@ -830,24 +831,22 @@ namespace InAsync.Tests {
         }
 
         [TestMethod]
+        public void Bench_StringConvert_NativeTryParser() {
+            foreach (var input in TryParse_BenchData) {
+                NativeTryParser.Default.Execute<int>(input, null);
+            }
+        }
+
+        [TestMethod]
         public void Bench_StringConvert_TryParse() {
-            //for (var i = 0; i < 1000; i++) {
-            //    foreach (var item in TryParse_TestDataSource) {
-            //        StringConvert.NativeTryParse<int>(item.input, null, out _);
-            //    }
-            //}
             foreach (var input in TryParse_BenchData) {
                 StringConvert.TryParse<int>(input, out _);
+                //StringConvert.TryParse(input, typeof(int), out _);
             }
         }
 
         [TestMethod]
         public void Bench_Int32_TryParse() {
-            //for (var i = 0; i < 1000; i++) {
-            //    foreach (var item in TryParse_TestDataSource) {
-            //        Int32.TryParse(item.input, out _);
-            //    }
-            //}
             foreach (var input in TryParse_BenchData) {
                 //Enum.TryParse<TestIntEnum>(input, out _);
                 Int32.TryParse(input, out _);
