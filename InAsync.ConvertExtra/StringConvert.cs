@@ -24,6 +24,7 @@ namespace InAsync {
     /// - <c>TimeSpan</c>
     /// - <c>Enum</c>
     /// - <c>Guid</c>
+    /// - 上記構造体の <c>Nullable</c> 型
     /// - <c>String</c>
     /// - <c>Version</c>
     /// - <c>Uri</c>

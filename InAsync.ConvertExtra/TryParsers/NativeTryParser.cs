@@ -16,7 +16,7 @@ namespace InAsync.ConvertExtra.TryParsers {
         }
 
         public TryParserResult<object> Execute(Type conversionType, string input, IFormatProvider provider) {
-            if (_tryParseCaches.TryGetValue(conversionType, out var tryParseLazy) == false) return TryParserResult<object>.Empty;
+            if (s_TryParseCaches.TryGetValue(conversionType, out var tryParseLazy) == false) return TryParserResult<object>.Empty;
 
             return new TryParserResult<object>(tryParseLazy.Value(input, provider, out var result), result);
         }
@@ -292,7 +292,7 @@ namespace InAsync.ConvertExtra.TryParsers {
             }
         }
 
-        private static readonly IReadOnlyDictionary<Type, Lazy<TryParseDelegate<object>>> _tryParseCaches = new Dictionary<Type, Lazy<TryParseDelegate<object>>> {
+        private static readonly IReadOnlyDictionary<Type, Lazy<TryParseDelegate<object>>> s_TryParseCaches = new Dictionary<Type, Lazy<TryParseDelegate<object>>> {
             [typeof(byte)] = new Lazy<TryParseDelegate<object>>(() => MakeTryParseDeledate(typeof(byte))),
             [typeof(byte?)] = new Lazy<TryParseDelegate<object>>(() => MakeTryParseDeledate(typeof(byte?))),
             [typeof(sbyte)] = new Lazy<TryParseDelegate<object>>(() => MakeTryParseDeledate(typeof(sbyte))),
