@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace InAsync.ConvertExtra.TryParsers {
+namespace InAsync.ConvertExtras.TryParsers {
 
     public class EnumTryParser : ITryParser {
         public static readonly EnumTryParser Default = new EnumTryParser();

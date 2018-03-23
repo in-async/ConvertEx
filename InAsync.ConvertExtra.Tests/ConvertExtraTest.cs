@@ -1,4 +1,4 @@
-using InAsync.ConvertExtra.TryParsers;
+using InAsync.ConvertExtras.TryParsers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq;
 namespace InAsync.Tests {
 
     [TestClass]
-    public partial class StringConvertTest {
+    public partial class ConvertExtraTest {
         private static CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
         private static CultureInfo CurrentCulture = CultureInfo.CurrentCulture;
 
@@ -31,10 +31,10 @@ namespace InAsync.Tests {
         public void TryParse_T_input_result_Test() {
             try {
                 CultureInfo.CurrentCulture = InvariantCulture;
-                { (StringConvert.TryParse<float>("-Infinity", out var result), result).Is((true, float.NegativeInfinity)); }
+                { (ConvertExtra.TryParse<float>("-Infinity", out var result), result).Is((true, float.NegativeInfinity)); }
 
                 CultureInfo.CurrentCulture = StubJPCulture;
-                { (StringConvert.TryParse<float>("-Infinity", out var result), result).Is((false, 0)); }
+                { (ConvertExtra.TryParse<float>("-Infinity", out var result), result).Is((false, 0)); }
             }
             finally {
                 CultureInfo.CurrentCulture = CurrentCulture;
@@ -43,20 +43,20 @@ namespace InAsync.Tests {
 
         [TestMethod]
         public void TryParse_T_input_provider_result_Test() {
-            { (StringConvert.TryParse<int>("123.45", null, out var result), result).Is((false, 0)); }
-            { (StringConvert.TryParse<float>("123.45", null, out var result), result).Is((true, 123.45f)); }
-            { (StringConvert.TryParse<int>("123.45", InvariantCulture, out var result), result).Is((false, 0)); }
-            { (StringConvert.TryParse<float>("123.45", InvariantCulture, out var result), result).Is((true, 123.45f)); }
+            { (ConvertExtra.TryParse<int>("123.45", null, out var result), result).Is((false, 0)); }
+            { (ConvertExtra.TryParse<float>("123.45", null, out var result), result).Is((true, 123.45f)); }
+            { (ConvertExtra.TryParse<int>("123.45", InvariantCulture, out var result), result).Is((false, 0)); }
+            { (ConvertExtra.TryParse<float>("123.45", InvariantCulture, out var result), result).Is((true, 123.45f)); }
         }
 
         [TestMethod]
         public void TryParse_input_conversionType_result_Test() {
             try {
                 CultureInfo.CurrentCulture = InvariantCulture;
-                { (StringConvert.TryParse("-Infinity", typeof(float), out var result), result).Is((true, float.NegativeInfinity)); }
+                { (ConvertExtra.TryParse("-Infinity", typeof(float), out var result), result).Is((true, float.NegativeInfinity)); }
 
                 CultureInfo.CurrentCulture = StubJPCulture;
-                { (StringConvert.TryParse("-Infinity", typeof(float), out var result), result).Is((false, null)); }
+                { (ConvertExtra.TryParse("-Infinity", typeof(float), out var result), result).Is((false, null)); }
             }
             finally {
                 CultureInfo.CurrentCulture = CurrentCulture;
@@ -66,7 +66,7 @@ namespace InAsync.Tests {
         [TestMethod]
         public void TryParse_input_conversionType_provider_result_Test() {
             foreach (var item in TryParse_TestDataSource) {
-                (StringConvert.TryParse(item.input, item.conversionType, item.provider, out var actual), actual).Is((item.expectedSuccess, item.expectedResult), item);
+                (ConvertExtra.TryParse(item.input, item.conversionType, item.provider, out var actual), actual).Is((item.expectedSuccess, item.expectedResult), item);
             }
         }
 
@@ -829,30 +829,5 @@ namespace InAsync.Tests {
 
         private class Foo {
         }
-
-        [TestMethod]
-        public void Bench_StringConvert_NativeTryParser() {
-            foreach (var input in TryParse_BenchData) {
-                NativeTryParser.Default.Execute<int>(input, null);
-            }
-        }
-
-        [TestMethod]
-        public void Bench_StringConvert_TryParse() {
-            foreach (var input in TryParse_BenchData) {
-                StringConvert.TryParse<int>(input, out _);
-                //StringConvert.TryParse(input, typeof(int), out _);
-            }
-        }
-
-        [TestMethod]
-        public void Bench_Int32_TryParse() {
-            foreach (var input in TryParse_BenchData) {
-                //Enum.TryParse<TestIntEnum>(input, out _);
-                Int32.TryParse(input, out _);
-            }
-        }
-
-        private static string[] TryParse_BenchData = Enumerable.Range(0, 500000).Select(i => i.ToString()).ToArray();
     }
 }

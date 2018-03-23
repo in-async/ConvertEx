@@ -1,4 +1,4 @@
-﻿using InAsync.ConvertExtra.TryParsers;
+﻿using InAsync.ConvertExtras.TryParsers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -30,7 +30,7 @@ namespace InAsync {
     /// - <c>Uri</c>
     /// - 文字列からの変換をサポートしている <see cref="TypeConverter"/> を持つ型
     /// </remarks>
-    public static partial class StringConvert {
+    public static partial class ConvertExtra {
 
         private static readonly IReadOnlyList<ITryParser> s_TryParsers = new ITryParser[]{
             NativeTryParser.Default,

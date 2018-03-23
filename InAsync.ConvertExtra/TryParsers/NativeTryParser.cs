@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
 
-namespace InAsync.ConvertExtra.TryParsers {
+namespace InAsync.ConvertExtras.TryParsers {
 
     public class NativeTryParser : ITryParser {
         public static readonly NativeTryParser Default = new NativeTryParser();
@@ -342,7 +342,7 @@ namespace InAsync.ConvertExtra.TryParsers {
 
             var tmpVar = Expression.Variable(conversionType, "tmp");
             var retVar = Expression.Variable(typeof(bool), "retVal");
-            var tryParseCall = Expression.Call(typeof(StringConvert), "TryParse", new[] { conversionType }, inputParam, providerParam, tmpVar);
+            var tryParseCall = Expression.Call(typeof(ConvertExtra), "TryParse", new[] { conversionType }, inputParam, providerParam, tmpVar);
             var bodyExpr = Expression.Block(
                   typeof(bool)
                 , new[] { tmpVar, retVar }

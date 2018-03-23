@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace InAsync.Tests {
 
-    public partial class StringConvertTest {
+    public partial class ConvertExtraTest {
 
         [TestMethod]
         public void ToHexString_Test() {
@@ -34,7 +34,7 @@ namespace InAsync.Tests {
         [TestMethod]
         public void FromHexString_Test() {
             foreach (var item in FromHexString_TestSource) {
-                if (!AssertException.TryExecute(() => StringConvert.FromHexString(item.hexString), item.expectedExceptionType, out var actual)) {
+                if (!AssertException.TryExecute(() => ConvertExtra.FromHexString(item.hexString), item.expectedExceptionType, out var actual)) {
                     continue;
                 }
 

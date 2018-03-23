@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Globalization;
 
-namespace InAsync.ConvertExtra.TryParsers {
+namespace InAsync.ConvertExtras.TryParsers {
 
     public class TypeConverterTryParser : ITryParser {
         public static readonly TypeConverterTryParser Default = new TypeConverterTryParser();

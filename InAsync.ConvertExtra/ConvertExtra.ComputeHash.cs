@@ -5,7 +5,7 @@ using System.Text;
 
 namespace InAsync {
 
-    public static partial class StringConvert {
+    public static partial class ConvertExtra {
 
         /// <summary>
         /// 文字列の <c>MD5</c> ハッシュ値を算出します。

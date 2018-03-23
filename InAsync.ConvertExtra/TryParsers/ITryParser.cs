@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace InAsync.ConvertExtra.TryParsers {
+namespace InAsync.ConvertExtras.TryParsers {
 
     public interface ITryParser {
 

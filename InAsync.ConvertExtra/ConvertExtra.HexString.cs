@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace InAsync {
 
-    public static partial class StringConvert {
+    public static partial class ConvertExtra {
 
         /// <summary>
         /// <c>Byte</c> 配列を 16 進文字列に変換します。
