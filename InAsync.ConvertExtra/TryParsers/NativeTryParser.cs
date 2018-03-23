@@ -8,17 +8,23 @@ namespace InAsync.ConvertExtras.TryParsers {
     public class NativeTryParser : ITryParser {
         public static readonly NativeTryParser Default = new NativeTryParser();
 
-        public TryParserResult<T> Execute<T>(string input, IFormatProvider provider) {
+        public bool? TryParse<T>(string input, IFormatProvider provider, out T result) {
             var tryParse = TryParseCache<T>.cache;
-            if (tryParse == null) return TryParserResult<T>.Empty;
+            if (tryParse == null) {
+                result = default(T);
+                return null;
+            }
 
-            return new TryParserResult<T>(tryParse(input, provider, out var result), result);
+            return tryParse(input, provider, out result);
         }
 
-        public TryParserResult<object> Execute(Type conversionType, string input, IFormatProvider provider) {
-            if (s_TryParseCaches.TryGetValue(conversionType, out var tryParseLazy) == false) return TryParserResult<object>.Empty;
+        public bool? TryParse(Type conversionType, string input, IFormatProvider provider, out object result) {
+            if (s_TryParseCaches.TryGetValue(conversionType, out var tryParseLazy) == false) {
+                result = null;
+                return null;
+            }
 
-            return new TryParserResult<object>(tryParseLazy.Value(input, provider, out var result), result);
+            return tryParseLazy.Value(input, provider, out result);
         }
 
         private delegate bool TryParseDelegate<TResult>(string input, IFormatProvider provider, out TResult result);

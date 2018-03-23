@@ -4,22 +4,8 @@ namespace InAsync.ConvertExtras.TryParsers {
 
     public interface ITryParser {
 
-        TryParserResult<T> Execute<T>(string input, IFormatProvider provider);
+        bool? TryParse<T>(string input, IFormatProvider provider, out T result);
 
-        TryParserResult<object> Execute(Type conversionType, string input, IFormatProvider provider);
-    }
-
-    public struct TryParserResult<T> {
-        public static TryParserResult<T> Empty = new TryParserResult<T>();
-
-        public TryParserResult(bool success, T value) {
-            Parsed = true;
-            Success = success;
-            Value = value;
-        }
-
-        public bool Parsed { get; }
-        public bool Success { get; }
-        public T Value { get; }
+        bool? TryParse(Type conversionType, string input, IFormatProvider provider, out object result);
     }
 }

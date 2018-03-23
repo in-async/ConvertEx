@@ -32,6 +32,8 @@ namespace InAsync {
     /// </remarks>
     public static partial class ConvertExtra {
 
+        #region Generics
+
         private static readonly IReadOnlyList<ITryParser> s_TryParsers = new ITryParser[]{
             NativeTryParser.Default,
             EnumTryParser.Default,
@@ -70,16 +72,18 @@ namespace InAsync {
             for (var i = 0; i < s_TryParsers.Count; i++) {
                 var tryParser = s_TryParsers[i];
 
-                var parserResult = tryParser.Execute<T>(input, provider);
-                if (parserResult.Parsed) {
-                    result = parserResult.Value;
-                    return parserResult.Success;
+                if (tryParser.TryParse<T>(input, provider, out result) is bool success) {
+                    return success;
                 }
             }
 
             result = default(T);
             return false;
         }
+
+        #endregion Generics
+
+        #region Non generics
 
         /// <summary>
         /// 文字列を <paramref name="conversionType"/> の型に変換します。
@@ -109,15 +113,15 @@ namespace InAsync {
             for (var i = 0; i < s_TryParsers.Count; i++) {
                 var tryParser = s_TryParsers[i];
 
-                var parserResult = tryParser.Execute(conversionType, input, provider);
-                if (parserResult.Parsed) {
-                    result = parserResult.Value;
-                    return parserResult.Success;
+                if (tryParser.TryParse(conversionType, input, provider, out result) is bool success) {
+                    return success;
                 }
             }
 
             result = null;
             return false;
         }
+
+        #endregion Non generics
     }
 }

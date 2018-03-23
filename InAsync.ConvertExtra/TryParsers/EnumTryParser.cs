@@ -5,15 +5,15 @@ namespace InAsync.ConvertExtras.TryParsers {
     public class EnumTryParser : ITryParser {
         public static readonly EnumTryParser Default = new EnumTryParser();
 
-        public TryParserResult<T> Execute<T>(string input, IFormatProvider provider) {
-            return ExecuteCore<T>(typeof(T), input, provider);
+        public bool? TryParse<T>(string input, IFormatProvider provider, out T result) {
+            return TryParseCore<T>(typeof(T), input, provider, out result);
         }
 
-        public TryParserResult<object> Execute(Type conversionType, string input, IFormatProvider provider) {
-            return ExecuteCore<object>(conversionType, input, provider);
+        public bool? TryParse(Type conversionType, string input, IFormatProvider provider, out object result) {
+            return TryParseCore<object>(conversionType, input, provider, out result);
         }
 
-        private TryParserResult<TReturn> ExecuteCore<TReturn>(Type conversionType, string input, IFormatProvider provider) {
+        private bool? TryParseCore<TResult>(Type conversionType, string input, IFormatProvider provider, out TResult result) {
             // 変換先が Nullable なら基の型を取得。
             var simpleType = Nullable.GetUnderlyingType(conversionType);
             bool isNullable;
@@ -24,19 +24,25 @@ namespace InAsync.ConvertExtras.TryParsers {
             else {
                 isNullable = true;
             }
-            if (simpleType.IsEnum == false) return TryParserResult<TReturn>.Empty;
+            if (simpleType.IsEnum == false) {
+                result = default(TResult);
+                return null;
+            }
 
             // 変換先が Nullable の場合は、null から null への変換は正常と見做す。
             if (input == null && isNullable) {
-                return new TryParserResult<TReturn>(true, default(TReturn));
+                result = default(TResult);
+                return true;
             }
 
             // HACK 暫定
             try {
-                return new TryParserResult<TReturn>(true, (TReturn)Enum.Parse(simpleType, input, ignoreCase: true));
+                result = (TResult)Enum.Parse(simpleType, input, ignoreCase: true);
+                return true;
             }
             catch (Exception ex) when (ex is ArgumentException || ex is OverflowException) {
-                return new TryParserResult<TReturn>(false, default(TReturn));
+                result = default(TResult);
+                return false;
             }
         }
     }
