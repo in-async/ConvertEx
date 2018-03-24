@@ -35,6 +35,7 @@ namespace InAsync {
         #region Generics
 
         private static readonly IReadOnlyList<ITryParser> s_TryParsers = new ITryParser[]{
+            FastTryParser.Default,
             NativeTryParser.Default,
             EnumTryParser.Default,
             TypeConverterTryParser.Default,
