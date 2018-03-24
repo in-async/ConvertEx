@@ -30,7 +30,7 @@ namespace InAsync.ConvertExtras.TryParsers {
         private delegate bool TryParseDelegate<TResult>(string input, IFormatProvider provider, out TResult result);
 
         private static class TryParseCache<TResult> {
-            public static TryParseDelegate<TResult> cache;
+            public static readonly TryParseDelegate<TResult> cache;
 
             static TryParseCache() {
                 TryParseCache<byte>.cache = (string value, IFormatProvider provider, out byte result) => byte.TryParse(value, NumberStyles.Integer, provider, out result);
@@ -337,7 +337,18 @@ namespace InAsync.ConvertExtras.TryParsers {
         };
 
         /// <summary>
-        ///
+        /// <code>
+        /// bool TryParseDelegate<object>(string input, IFormatProvider provider, ref object result) {
+        ///     bool retVal = (Default.TryParse<ConversionType>(input, provider, out ConversionType tmp).GetValueOrDefault(true));
+        ///     if (retVal) {
+        ///         result = (object)tmp;
+        ///     }
+        ///     else {
+        ///         result = null;
+        ///     }
+        ///     return retVal;
+        /// }
+        /// </code>
         /// </summary>
         /// <param name="conversionType"></param>
         /// <returns></returns>
@@ -348,13 +359,13 @@ namespace InAsync.ConvertExtras.TryParsers {
 
             var tmpVar = Expression.Variable(conversionType, "tmp");
             var retVar = Expression.Variable(typeof(bool), "retVal");
-            var tryParseCall = Expression.Call(typeof(ConvertExtra), "TryParse", new[] { conversionType }, inputParam, providerParam, tmpVar);
+            var tryParseCall = Expression.Call(Expression.Constant(Default), "TryParse", new[] { conversionType }, inputParam, providerParam, tmpVar);
             var bodyExpr = Expression.Block(
                   typeof(bool)
                 , new[] { tmpVar, retVar }
-                , Expression.Assign(retVar, tryParseCall)
+                , Expression.Assign(retVar, Expression.Call(tryParseCall, "GetValueOrDefault", null, Expression.Constant(true)))
                 , Expression.IfThenElse(
-                    retVar
+                      retVar
                     , Expression.Assign(resultParam, Expression.Convert(tmpVar, typeof(object)))
                     , Expression.Assign(resultParam, Expression.Constant(null))
                 )
