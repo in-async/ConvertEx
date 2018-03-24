@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
-namespace InAsync.ConvertExtras.TryParsers {
+namespace InAsync.ConvertExtras.TryParseProviders {
 
-    public class NativeTryParser : TypeTryParser {
-        public static readonly NativeTryParser Default = new NativeTryParser();
+    public class NativeTryParseProvider : TryParseProvider {
+        public static readonly NativeTryParseProvider Default = new NativeTryParseProvider();
 
-        protected override TryParseDelegate<T> GetTryParseDelegate<T>() => GenericTryParsers<T>.Value;
+        public override TryParseDelegate<T> GetDelegate<T>() => GenericTryParsers<T>.Value;
 
-        protected override TryParseDelegate<object> GetTryParseDelegate(Type conversionType) => NonGenericTryParsers.GetValue(conversionType);
+        public override TryParseDelegate<object> GetDelegate(Type conversionType) => NonGenericTryParsers.GetValue(conversionType);
 
         private static class GenericTryParsers<TResult> {
             public static readonly TryParseDelegate<TResult> Value;
@@ -72,12 +73,9 @@ namespace InAsync.ConvertExtras.TryParsers {
             }
         }
 
-        private static readonly NonGenericTryParsersImpl NonGenericTryParsers = new NonGenericTryParsersImpl(Default);
-        private class NonGenericTryParsersImpl : NonGenericTryParsersBase {
-            public NonGenericTryParsersImpl(TypeTryParser tryParser) : base(tryParser) {
-            }
+        private static class NonGenericTryParsers {
 
-            protected override IReadOnlyList<Type> SupportedTypes { get; } = new[]{
+            private static readonly IReadOnlyDictionary<Type, Lazy<TryParseDelegate<object>>> _values = new[]{
                 typeof(byte),
                 typeof(byte?),
                 typeof(sbyte),
@@ -113,7 +111,19 @@ namespace InAsync.ConvertExtras.TryParsers {
                 typeof(string),
                 typeof(Version),
                 typeof(Uri),
-            };
+            }.ToDictionary(
+                  type => type
+                , type => new Lazy<TryParseDelegate<object>>(() => Default.MakeNonGenericTryParse(type))
+            );
+
+            /// <summary>
+            /// 文字列を <paramref name="conversionType"/> に変換するデリゲートを返します。
+            /// </summary>
+            /// <param name="conversionType">変換後の型。</param>
+            /// <returns><paramref name="conversionType"/> がサポートされていれば変換デリゲートが返され、それ以外の場合は <c>null</c> が返ります。</returns>
+            public static TryParseDelegate<object> GetValue(Type conversionType) {
+                return _values.TryGetValue(conversionType, out var valueLazy) ? valueLazy.Value : null;
+            }
         }
     }
 }

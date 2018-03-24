@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>ConvertExtraBenchmark</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet=v0.10.13, OS=Windows 7 SP1 (6.1.7601.0)
+Intel Core i5-3570K CPU 3.40GHz (Ivy Bridge), 1 CPU, 4 logical cores and 4 physical cores
+Frequency=3320371 Hz, Resolution=301.1712 ns, Timer=TSC
+.NET Core SDK=2.1.4
+  [Host] : .NET Core 2.0.5 (CoreCLR 4.6.26020.03, CoreFX 4.6.26018.01), 64bit RyuJIT
+  Core   : .NET Core 2.0.5 (CoreCLR 4.6.26020.03, CoreFX 4.6.26018.01), 64bit RyuJIT
+</code></pre>
+<pre><code>Job=Core  Runtime=Core  
+</code></pre>
+
+<table>
+<thead><tr><th>                Method</th><th>                  Input</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Scaled</th>
+</tr>
+</thead><tbody><tr><td>ConvertExtra_FastTryParser</td><td>79228162514264337593543950335</td><td>80.11 ns</td><td>0.4353 ns</td><td>0.4072 ns</td><td>0.33</td>
+</tr><tr><td>ConvertExtra_NativeTryParser</td><td>79228162514264337593543950335</td><td>274.65 ns</td><td>0.8156 ns</td><td>0.7629 ns</td><td>1.12</td>
+</tr><tr><td>Int32_TryParse</td><td>79228162514264337593543950335</td><td>245.83 ns</td><td>0.9495 ns</td><td>0.8417 ns</td><td>1.00</td>
+</tr></tbody></table>
+</body>
+</html>

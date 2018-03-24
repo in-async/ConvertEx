@@ -1,4 +1,4 @@
-﻿using InAsync.ConvertExtras.TryParsers;
+﻿using InAsync.ConvertExtras.TryParseProviders;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -34,11 +34,11 @@ namespace InAsync {
 
         #region Generics
 
-        private static readonly IReadOnlyList<ITryParser> s_TryParsers = new ITryParser[]{
-            FastTryParser.Default,
-            NativeTryParser.Default,
-            EnumTryParser.Default,
-            TypeConverterTryParser.Default,
+        private static readonly IReadOnlyList<ITryParseProvider> s_tryParseProviders = new ITryParseProvider[]{
+            FastTryParseProvider.Default,
+            NativeTryParseProvider.Default,
+            EnumTryParseProvider.Default,
+            TypeConverterTryParserProvider.Default,
         };
 
         /// <summary>
@@ -70,11 +70,10 @@ namespace InAsync {
         /// <param name="result">変換に成功すれば変換後の値、それ以外なら <typeparamref name="T"/> の既定値が返されます。</param>
         /// <returns>変換に成功すれば <c>true</c>、それ以外なら <c>false</c>。</returns>
         public static bool TryParse<T>(string input, IFormatProvider provider, out T result) {
-            for (var i = 0; i < s_TryParsers.Count; i++) {
-                var tryParser = s_TryParsers[i];
-
-                if (tryParser.TryParse<T>(input, provider, out result) is bool success) {
-                    return success;
+            for (var i = 0; i < s_tryParseProviders.Count; i++) {
+                var tryParse = s_tryParseProviders[i].GetDelegate<T>();
+                if (tryParse != null) {
+                    return tryParse(input, provider, out result);
                 }
             }
 
@@ -111,11 +110,10 @@ namespace InAsync {
             Contract.Ensures(Contract.Result<bool>() || Contract.ValueAtReturn(out result) == null);
             Contract.EndContractBlock();
 
-            for (var i = 0; i < s_TryParsers.Count; i++) {
-                var tryParser = s_TryParsers[i];
-
-                if (tryParser.TryParse(conversionType, input, provider, out result) is bool success) {
-                    return success;
+            for (var i = 0; i < s_tryParseProviders.Count; i++) {
+                var tryParse = s_tryParseProviders[i].GetDelegate(conversionType);
+                if (tryParse != null) {
+                    return tryParse(input, provider, out result);
                 }
             }
 

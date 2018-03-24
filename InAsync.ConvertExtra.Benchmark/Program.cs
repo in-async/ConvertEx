@@ -1,52 +1,80 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using InAsync.ConvertExtra.TryParsers;
+using InAsync.ConvertExtras.TryParseProviders;
 using System;
 
-namespace InAsync.ConvertExtra.Benchmark {
+namespace InAsync.Benchmark {
 
     public class Program {
 
         private static void Main(string[] args) {
-            BenchmarkRunner.Run<ConvertBenchmark>();
+            BenchmarkRunner.Run<ConvertExtraBenchmark>();
         }
     }
 
-    public class BenchmarkConfig : ManualConfig {
+    [Config(typeof(Config))]
+    public class ConvertExtraBenchmark {
 
-        public BenchmarkConfig() {
-            Add(MarkdownExporter.GitHub);
-            Add(MemoryDiagnoser.Default);
-            Add(Job.ShortRun);
+        private sealed class Config : ManualConfig {
+
+            public Config() {
+                //Add(MarkdownExporter.GitHub);
+                //Add(MemoryDiagnoser.Default);
+                //Add(StatisticColumn.Min, StatisticColumn.Max);
+                Add(Job.Core);
+                //Add(Job.ShortRun);
+            }
         }
-    }
 
-    [Config(typeof(BenchmarkConfig))]
-    public class ConvertBenchmark {
-        private static string TryParse_BenchData;
+        [Params("79228162514264337593543950335"/*, "abc"*/)]
+        public string Input { get; set; }
 
-        [GlobalSetup]
-        public void Setup() {
-            TryParse_BenchData = new Random().Next().ToString();
+        [Benchmark]
+        public void ConvertExtra_FastTryParser() {
+            FastTryParseProvider.Default.GetDelegate<int>()(Input, null, out _);
         }
 
         [Benchmark]
-        public TryParserResult<int> Bench_StringConvert_NativeTryParser() {
-            return NativeTryParser.Default.Execute<int>(TryParse_BenchData, null);
+        public void ConvertExtra_NativeTryParser() {
+            NativeTryParseProvider.Default.GetDelegate<int>()(Input, null, out _);
         }
 
-        [Benchmark]
-        public bool Bench_StringConvert_TryParse() {
-            return StringConvert.TryParse<int>(TryParse_BenchData, out _);
-        }
+        //[Benchmark]
+        //public void ConvertExtra_NativeTryParser_NonGeneric() {
+        //    NativeTryParser.Default.TryParse(typeof(int), Input, null, out _);
+        //}
+
+        //[Benchmark]
+        //public bool ConvertExtra_TryParse_Generic() {
+        //    return ConvertExtra.TryParse<int>(Input, out _);
+        //}
+
+        //[Benchmark]
+        //public bool ConvertExtra_TryParse_NonGeneric() {
+        //    return ConvertExtra.TryParse(Input, typeof(int), out _);
+        //}
+
+        //[Benchmark]
+        //public int ConvertExtra_To() {
+        //    return Input.To<int>();
+        //}
 
         [Benchmark(Baseline = true)]
-        public bool Bench_Int32_TryParse() {
-            return Int32.TryParse(TryParse_BenchData, out _);
+        public void Int32_TryParse() {
+            Int32.TryParse(Input, out var result);
         }
+
+        //[Benchmark]
+        //public bool foo() {
+        //    var ch = Input[0];
+        //    return (ch < '0' || '9' < ch);
+        //}
+
+        //[Benchmark(Baseline = true)]
+        //public bool bar() {
+        //    return Char.IsDigit(Input, 0);
+        //}
     }
 }
