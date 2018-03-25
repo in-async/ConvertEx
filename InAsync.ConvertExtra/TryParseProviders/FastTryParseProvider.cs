@@ -4,6 +4,17 @@ using System.Linq;
 
 namespace InAsync.ConvertExtras.TryParseProviders {
 
+    /// <summary>
+    /// 文字列から特定の型への変換デリゲートを提供する <see cref="ITryParseProvider"/> クラス。
+    /// </summary>
+    /// <remarks>
+    /// 変換先としてサポートされている型は以下の通りです。
+    /// - <c>Byte</c> / <c>SByte</c>
+    /// - <c>Int16</c> / <c>UInt16</c>
+    /// - <c>Int32</c> / <c>UInt32</c>
+    /// - <c>Int64</c> / <c>UInt64</c>
+    /// - 上記構造体の <c>Nullable</c> 型
+    /// </remarks>
     public class FastTryParseProvider : TryParseProvider {
         public static readonly FastTryParseProvider Default = new FastTryParseProvider();
 
@@ -11,8 +22,12 @@ namespace InAsync.ConvertExtras.TryParseProviders {
 
         public override TryParseDelegate<object> GetDelegate(Type conversionType) => NonGenericTryParsers.GetValue(conversionType);
 
-        private static class GenericTryParsers<TResult> {
-            public static readonly TryParseDelegate<TResult> Value;
+        /// <summary>
+        /// 型パラメーターによって変換デリゲートコレクションを管理するクラス。
+        /// </summary>
+        /// <typeparam name="T">変換後の型。</typeparam>
+        private static class GenericTryParsers<T> {
+            public static readonly TryParseDelegate<T> Value;
 
             static GenericTryParsers() {
                 GenericTryParsers<byte>.Value = TryParse;
@@ -55,6 +70,14 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                 //GenericTryParser<Uri>.Value = (string value, IFormatProvider provider, out Uri result) => Uri.TryCreate(value, UriKind.Absolute, out result);
             }
 
+            /// <summary>
+            /// <typeparamref name="TStruct"/> の <see cref="Nullable"/> 型へ変換します。
+            /// </summary>
+            /// <typeparam name="TStruct"><see cref="Nullable"/> の基となる構造体型。</typeparam>
+            /// <param name="value">変換対象の文字列。</param>
+            /// <param name="provider">カルチャ固有の書式情報。</param>
+            /// <param name="result">変換に成功すれば変換後の値、それ以外なら <c>null</c> が返されます。</param>
+            /// <returns>変換に成功すれば <c>true</c>、それ以外なら <c>false</c>。</returns>
             private static bool TryParseToNullable<TStruct>(string value, IFormatProvider provider, out TStruct? result) where TStruct : struct {
                 if (value == null) {
                     result = null;
@@ -202,6 +225,9 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                 return true;
             }
 
+            /// <summary>
+            /// Invariant な数値フォーマット情報。
+            /// </summary>
             private static class InvariantNumberFormat {
                 public const char NumberGroupSeparator = ',';
                 public const char NegativeSign = '-';
@@ -209,6 +235,9 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             }
         }
 
+        /// <summary>
+        /// <see cref="Type"/> によって変換デリゲートコレクションを管理するクラス。
+        /// </summary>
         private static class NonGenericTryParsers {
 
             private static readonly IReadOnlyDictionary<Type, Lazy<TryParseDelegate<object>>> _values = new[]{

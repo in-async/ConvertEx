@@ -1,6 +1,5 @@
 ﻿using InAsync.ConvertExtras.TryParseProviders;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 
@@ -10,7 +9,7 @@ namespace InAsync {
     /// 文字列を任意の型へ変換するクラス。
     /// </summary>
     /// <remarks>
-    /// 変換先としてサポートする型は以下の通りです。
+    /// 変換先としてサポートされている型は以下の通りです。
     /// - <c>Byte</c> / <c>SByte</c>
     /// - <c>Int16</c> / <c>UInt16</c>
     /// - <c>Int32</c> / <c>UInt32</c>
@@ -32,14 +31,14 @@ namespace InAsync {
     /// </remarks>
     public static partial class ConvertExtra {
 
-        #region Generics
-
-        private static readonly IReadOnlyList<ITryParseProvider> s_tryParseProviders = new ITryParseProvider[]{
+        private static readonly ITryParseProvider _tryParseProvider = new CompositeTryParseProvider(new ITryParseProvider[]{
             FastTryParseProvider.Default,
             NativeTryParseProvider.Default,
             EnumTryParseProvider.Default,
             TypeConverterTryParserProvider.Default,
-        };
+        });
+
+        #region Generics
 
         /// <summary>
         /// 文字列を <typeparamref name="T"/> の型に変換します。
@@ -70,15 +69,13 @@ namespace InAsync {
         /// <param name="result">変換に成功すれば変換後の値、それ以外なら <typeparamref name="T"/> の既定値が返されます。</param>
         /// <returns>変換に成功すれば <c>true</c>、それ以外なら <c>false</c>。</returns>
         public static bool TryParse<T>(string input, IFormatProvider provider, out T result) {
-            for (var i = 0; i < s_tryParseProviders.Count; i++) {
-                var tryParse = s_tryParseProviders[i].GetDelegate<T>();
-                if (tryParse != null) {
-                    return tryParse(input, provider, out result);
-                }
+            var tryParse = _tryParseProvider.GetDelegate<T>();
+            if (tryParse == null) {
+                result = default(T);
+                return false;
             }
 
-            result = default(T);
-            return false;
+            return tryParse(input, provider, out result);
         }
 
         #endregion Generics
@@ -110,15 +107,13 @@ namespace InAsync {
             Contract.Ensures(Contract.Result<bool>() || Contract.ValueAtReturn(out result) == null);
             Contract.EndContractBlock();
 
-            for (var i = 0; i < s_tryParseProviders.Count; i++) {
-                var tryParse = s_tryParseProviders[i].GetDelegate(conversionType);
-                if (tryParse != null) {
-                    return tryParse(input, provider, out result);
-                }
+            var tryParse = _tryParseProvider.GetDelegate(conversionType);
+            if (tryParse == null) {
+                result = null;
+                return false;
             }
 
-            result = null;
-            return false;
+            return tryParse(input, provider, out result);
         }
 
         #endregion Non generics

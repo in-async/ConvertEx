@@ -3,19 +3,19 @@
 namespace InAsync.ConvertExtras.TryParseProviders {
 
     /// <summary>
-    /// 文字列を任意の型へ変換するデリゲートのプロバイダー。
+    /// 文字列から任意の型への変換デリゲートを提供するプロバイダー。
     /// </summary>
     public interface ITryParseProvider {
 
         /// <summary>
-        /// 文字列を <typeparamref name="T"/> に変換する為のデリゲートを返します。
+        /// 文字列から <typeparamref name="T"/> に変換するデリゲートを返します。
         /// </summary>
         /// <typeparam name="T">変換後の型。</typeparam>
         /// <returns><typeparamref name="T"/> への変換がサポートされていれば <see cref="TryParseDelegate{T}"/> デリゲートを、それ以外なら <c>null</c> を返します。</returns>
         TryParseDelegate<T> GetDelegate<T>();
 
         /// <summary>
-        /// 文字列を <paramref name="conversionType"/> に変換する為のデリゲートを返します。
+        /// 文字列から <paramref name="conversionType"/> に変換するデリゲートを返します。
         /// </summary>
         /// <param name="conversionType">変換後の型。</param>
         /// <returns><paramref name="conversionType"/> への変換がサポートされていれば <see cref="TryParseDelegate{object}"/> デリゲートを、それ以外なら <c>null</c> を返します。</returns>
@@ -23,7 +23,7 @@ namespace InAsync.ConvertExtras.TryParseProviders {
     }
 
     /// <summary>
-    /// 文字列を <typeparamref name="T"/> の型に変換する為のデリゲート型。
+    /// 文字列から <typeparamref name="T"/> に変換する為のデリゲート型。
     /// </summary>
     /// <typeparam name="T">変換後の型。</typeparam>
     /// <param name="input">入力文字列。</param>

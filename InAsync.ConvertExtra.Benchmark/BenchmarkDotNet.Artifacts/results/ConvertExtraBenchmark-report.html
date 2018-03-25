@@ -24,11 +24,12 @@ Frequency=3320371 Hz, Resolution=301.1712 ns, Timer=TSC
 </code></pre>
 
 <table>
-<thead><tr><th>                Method</th><th>                  Input</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Scaled</th>
+<thead><tr><th>               Method</th><th>                  Input</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Median</th><th>Scaled</th><th>ScaledSD</th>
 </tr>
-</thead><tbody><tr><td>ConvertExtra_FastTryParser</td><td>79228162514264337593543950335</td><td>80.11 ns</td><td>0.4353 ns</td><td>0.4072 ns</td><td>0.33</td>
-</tr><tr><td>ConvertExtra_NativeTryParser</td><td>79228162514264337593543950335</td><td>274.65 ns</td><td>0.8156 ns</td><td>0.7629 ns</td><td>1.12</td>
-</tr><tr><td>Int32_TryParse</td><td>79228162514264337593543950335</td><td>245.83 ns</td><td>0.9495 ns</td><td>0.8417 ns</td><td>1.00</td>
+</thead><tbody><tr><td>ConvertExtra_TryParse</td><td>79228162514264337593543950335</td><td>141.48 ns</td><td>13.93 ns</td><td>41.08 ns</td><td>138.03 ns</td><td>0.33</td><td>0.11</td>
+</tr><tr><td>ConvertExtra_FastTryParse</td><td>79228162514264337593543950335</td><td>99.68 ns</td><td>11.93 ns</td><td>35.19 ns</td><td>74.36 ns</td><td>0.23</td><td>0.09</td>
+</tr><tr><td>ConvertExtra_NativeTryParse</td><td>79228162514264337593543950335</td><td>431.25 ns</td><td>36.77 ns</td><td>108.41 ns</td><td>434.38 ns</td><td>0.99</td><td>0.30</td>
+</tr><tr><td>Int32_TryParse</td><td>79228162514264337593543950335</td><td>444.48 ns</td><td>22.83 ns</td><td>67.32 ns</td><td>443.74 ns</td><td>1.00</td><td>0.00</td>
 </tr></tbody></table>
 </body>
 </html>
