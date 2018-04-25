@@ -46,12 +46,12 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                 GenericTryParsers<long?>.Value = TryParseToNullable;
                 GenericTryParsers<ulong>.Value = TryParse;
                 GenericTryParsers<ulong?>.Value = TryParseToNullable;
-                //GenericTryParser<float>.Value = (string value, IFormatProvider provider, out float result) => float.TryParse(value, NumberStyles.Float | NumberStyles.AllowThousands, provider, out result);
-                //GenericTryParser<float?>.Value = TryParseToNullable;
-                //GenericTryParser<double>.Value = (string value, IFormatProvider provider, out double result) => double.TryParse(value, NumberStyles.Float | NumberStyles.AllowThousands, provider, out result);
-                //GenericTryParser<double?>.Value = TryParseToNullable;
-                //GenericTryParser<decimal>.Value = (string value, IFormatProvider provider, out decimal result) => decimal.TryParse(value, NumberStyles.Number, provider, out result);
-                //GenericTryParser<decimal?>.Value = TryParseToNullable;
+                GenericTryParsers<float>.Value = TryParse;
+                GenericTryParsers<float?>.Value = TryParseToNullable;
+                GenericTryParsers<double>.Value = TryParse;
+                GenericTryParsers<double?>.Value = TryParseToNullable;
+                GenericTryParsers<decimal>.Value = TryParse;
+                GenericTryParsers<decimal?>.Value = TryParseToNullable;
                 GenericTryParsers<bool>.Value = (string value, IFormatProvider provider, out bool result) => {
                     if (string.IsNullOrEmpty(value) == false) {
                         value = value.Trim();
@@ -284,11 +284,37 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                 return true;
             }
 
+            private static bool TryParse(string value, IFormatProvider provider, out float result) {
+                if (TryParseToFloat(value, provider, out var tmp)) {
+                    result = (float)tmp;
+                    if (result == tmp) return true;
+                }
+                result = 0;
+                return false;
+            }
+
+            private static bool TryParse(string value, IFormatProvider provider, out double result) {
+                return TryParseToFloat(value, provider, out result);
+            }
+
+            private static bool TryParseToFloat(string value, IFormatProvider provider, out double result) {
+                throw new NotImplementedException();
+            }
+
+            private static bool TryParse(string value, IFormatProvider provider, out decimal result) {
+                return TryParseToDecimal(value, provider, out result);
+            }
+
+            private static bool TryParseToDecimal(string value, IFormatProvider provider, out decimal result) {
+                throw new NotImplementedException();
+            }
+
             /// <summary>
             /// Invariant な数値フォーマット情報。
             /// </summary>
             private static class InvariantNumberFormat {
                 public const char NumberGroupSeparator = ',';
+                public const char NumberDecimalSeparator = '.';
                 public const char NegativeSign = '-';
                 public const char PositiveSign = '+';
             }
@@ -316,12 +342,12 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                 typeof(long?),
                 typeof(ulong),
                 typeof(ulong?),
-                //typeof(float),
-                //typeof(float?),
-                //typeof(double),
-                //typeof(double?),
-                //typeof(decimal),
-                //typeof(decimal?),
+                typeof(float),
+                typeof(float?),
+                typeof(double),
+                typeof(double?),
+                typeof(decimal),
+                typeof(decimal?),
                 typeof(bool),
                 typeof(bool?),
                 typeof(char),
