@@ -812,13 +812,13 @@ namespace InAsync.Tests.TestHelpers {
             },
             // Attributed TypeConverter class
             [typeof(TypeConvertableClass)] = new TryParseTestCase[]{
-                ( 1, ""        , typeof(TypeConvertableClass), InvariantCulture, true , ""        ),
-                ( 2, "0"       , typeof(TypeConvertableClass), InvariantCulture, true , "0"       ),
-                ( 3, "+1"      , typeof(TypeConvertableClass), InvariantCulture, true , "+1"      ),
-                ( 4, "-1"      , typeof(TypeConvertableClass), InvariantCulture, true , "-1"      ),
-                ( 5, "0x10"    , typeof(TypeConvertableClass), InvariantCulture, true , "0x10"    ),
-                ( 6, "1,234"   , typeof(TypeConvertableClass), InvariantCulture, true , "1,234"   ),
-                ( 7, "1,234.56", typeof(TypeConvertableClass), InvariantCulture, true , "1,234.56"),
+                ( 1, ""        , typeof(TypeConvertableClass), InvariantCulture, true , new TypeConvertableClass(""        )),
+                ( 2, "0"       , typeof(TypeConvertableClass), InvariantCulture, true , new TypeConvertableClass("0"       )),
+                ( 3, "+1"      , typeof(TypeConvertableClass), InvariantCulture, true , new TypeConvertableClass("+1"      )),
+                ( 4, "-1"      , typeof(TypeConvertableClass), InvariantCulture, true , new TypeConvertableClass("-1"      )),
+                ( 5, "0x10"    , typeof(TypeConvertableClass), InvariantCulture, true , new TypeConvertableClass("0x10"    )),
+                ( 6, "1,234"   , typeof(TypeConvertableClass), InvariantCulture, true , new TypeConvertableClass("1,234"   )),
+                ( 7, "1,234.56", typeof(TypeConvertableClass), InvariantCulture, true , new TypeConvertableClass("1,234.56")),
                 ( 8, null      , typeof(TypeConvertableClass), InvariantCulture, false, null),
             },
             // Vanilla class

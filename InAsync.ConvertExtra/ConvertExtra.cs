@@ -21,8 +21,8 @@ namespace InAsync {
     /// - <c>Char</c>
     /// - <c>DateTime</c>
     /// - <c>TimeSpan</c>
-    /// - <c>Enum</c>
     /// - <c>Guid</c>
+    /// - <c>Enum</c>
     /// - 上記構造体の <c>Nullable</c> 型
     /// - <c>String</c>
     /// - <c>Version</c>
@@ -35,7 +35,7 @@ namespace InAsync {
             FastTryParseProvider.Default,
             NativeTryParseProvider.Default,
             EnumTryParseProvider.Default,
-            TypeConverterTryParserProvider.Default,
+            TypeConverterTryParseProvider.Default,
         });
 
         #region Generics

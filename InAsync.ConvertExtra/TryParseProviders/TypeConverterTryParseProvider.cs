@@ -7,8 +7,8 @@ namespace InAsync.ConvertExtras.TryParseProviders {
     /// <summary>
     /// 文字列から、<see cref="TypeConverter"/> を実装している型への変換デリゲートを提供する <see cref="ITryParseProvider"/> クラス。
     /// </summary>
-    public class TypeConverterTryParserProvider : TryParseProvider {
-        public static readonly TypeConverterTryParserProvider Default = new TypeConverterTryParserProvider();
+    public class TypeConverterTryParseProvider : TryParseProvider {
+        public static readonly TypeConverterTryParseProvider Default = new TypeConverterTryParseProvider();
 
         public override TryParseDelegate<T> GetDelegate<T>() {
             var converter = GetConverter(typeof(T));

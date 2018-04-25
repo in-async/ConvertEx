@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 
@@ -31,5 +32,19 @@ namespace InAsync.Tests.TestHelpers.Models {
                 return base.ConvertFrom(context, culture, value);
             }
         }
+
+        #region for Assert.Equals()
+
+        public override bool Equals(object obj) {
+            var @class = obj as TypeConvertableClass;
+            return @class != null &&
+                   Value == @class.Value;
+        }
+
+        public override int GetHashCode() {
+            return -1937169414 + EqualityComparer<string>.Default.GetHashCode(Value);
+        }
+
+        #endregion for Assert.Equals()
     }
 }
