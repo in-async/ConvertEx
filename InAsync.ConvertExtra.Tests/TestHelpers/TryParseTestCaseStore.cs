@@ -532,7 +532,7 @@ namespace InAsync.Tests.TestHelpers {
                 (16, "a"                     , typeof(char), InvariantCulture, true , 'a'),
                 (17, "ab"                    , typeof(char), InvariantCulture, false, null),
                 (18, "あ"                    , typeof(char), InvariantCulture, true , 'あ'),
-                (19, "あ"                    , typeof(char), StubJPCulture , true , 'あ'),
+                (19, "あ"                    , typeof(char), StubJPCulture   , true , 'あ'),
             },
             [typeof(char?)] = new TryParseTestCase[]{
                 ( 1, ""                      , typeof(char?), InvariantCulture, false, null),
@@ -552,7 +552,7 @@ namespace InAsync.Tests.TestHelpers {
                 (16, "a"                     , typeof(char?), InvariantCulture, true , 'a'),
                 (17, "ab"                    , typeof(char?), InvariantCulture, false, null),
                 (18, "あ"                    , typeof(char?), InvariantCulture, true , 'あ'),
-                (19, "あ"                    , typeof(char?), StubJPCulture , true , 'あ'),
+                (19, "あ"                    , typeof(char?), StubJPCulture   , true , 'あ'),
             },
             [typeof(DateTime)] = new TryParseTestCase[]{
                 ( 1, ""                          , typeof(DateTime), InvariantCulture, false, null),

@@ -12,11 +12,11 @@ namespace InAsync.ConvertExtras.TryParseProviders.Tests {
 
         [TestMethod] public void GetDelegate_ByteEnum() => InternalGetDelegate_Supported<ByteEnum>();
 
-        [TestMethod] public void GetDelegate_NByteEnum() => InternalGetDelegate_Supported<ByteEnum?>();
+        [TestMethod] public void GetDelegate_ByteEnumN() => InternalGetDelegate_Supported<ByteEnum?>();
 
         [TestMethod] public void GetDelegate_IntEnum() => InternalGetDelegate_Supported<IntEnum>();
 
-        [TestMethod] public void GetDelegate_NIntEnum() => InternalGetDelegate_Supported<IntEnum?>();
+        [TestMethod] public void GetDelegate_IntEnumN() => InternalGetDelegate_Supported<IntEnum?>();
 
         private void InternalGetDelegate_Supported<TConversionType>() {
             foreach (var item in TryParseTestCaseStore.Query<TConversionType>()) {
@@ -30,67 +30,67 @@ namespace InAsync.ConvertExtras.TryParseProviders.Tests {
 
         [TestMethod] public void GetDelegate_Byte() => InternalGetDelegate_NotSupported<Byte>();
 
-        [TestMethod] public void GetDelegate_NByte() => InternalGetDelegate_NotSupported<Byte?>();
+        [TestMethod] public void GetDelegate_ByteN() => InternalGetDelegate_NotSupported<Byte?>();
 
         [TestMethod] public void GetDelegate_SByte() => InternalGetDelegate_NotSupported<SByte>();
 
-        [TestMethod] public void GetDelegate_NSByte() => InternalGetDelegate_NotSupported<SByte?>();
+        [TestMethod] public void GetDelegate_SByteN() => InternalGetDelegate_NotSupported<SByte?>();
 
         [TestMethod] public void GetDelegate_Int16() => InternalGetDelegate_NotSupported<Int16>();
 
-        [TestMethod] public void GetDelegate_NInt16() => InternalGetDelegate_NotSupported<Int16?>();
+        [TestMethod] public void GetDelegate_Int16N() => InternalGetDelegate_NotSupported<Int16?>();
 
         [TestMethod] public void GetDelegate_UInt16() => InternalGetDelegate_NotSupported<UInt16>();
 
-        [TestMethod] public void GetDelegate_NUInt16() => InternalGetDelegate_NotSupported<UInt16?>();
+        [TestMethod] public void GetDelegate_UInt16N() => InternalGetDelegate_NotSupported<UInt16?>();
 
         [TestMethod] public void GetDelegate_Int32() => InternalGetDelegate_NotSupported<Int32>();
 
-        [TestMethod] public void GetDelegate_NInt32() => InternalGetDelegate_NotSupported<Int32?>();
+        [TestMethod] public void GetDelegate_Int32N() => InternalGetDelegate_NotSupported<Int32?>();
 
         [TestMethod] public void GetDelegate_UInt32() => InternalGetDelegate_NotSupported<UInt32>();
 
-        [TestMethod] public void GetDelegate_NUInt32() => InternalGetDelegate_NotSupported<UInt32?>();
+        [TestMethod] public void GetDelegate_UInt32N() => InternalGetDelegate_NotSupported<UInt32?>();
 
         [TestMethod] public void GetDelegate_Int64() => InternalGetDelegate_NotSupported<Int64>();
 
-        [TestMethod] public void GetDelegate_NInt64() => InternalGetDelegate_NotSupported<Int64?>();
+        [TestMethod] public void GetDelegate_Int64N() => InternalGetDelegate_NotSupported<Int64?>();
 
         [TestMethod] public void GetDelegate_UInt64() => InternalGetDelegate_NotSupported<UInt64>();
 
-        [TestMethod] public void GetDelegate_NUInt64() => InternalGetDelegate_NotSupported<UInt64?>();
+        [TestMethod] public void GetDelegate_UInt64N() => InternalGetDelegate_NotSupported<UInt64?>();
 
         [TestMethod] public void GetDelegate_Single() => InternalGetDelegate_NotSupported<Single>();
 
+        [TestMethod] public void GetDelegate_SingleN() => InternalGetDelegate_NotSupported<Single?>();
+
         [TestMethod] public void GetDelegate_Double() => InternalGetDelegate_NotSupported<Double>();
+
+        [TestMethod] public void GetDelegate_DoubleN() => InternalGetDelegate_NotSupported<Double?>();
 
         [TestMethod] public void GetDelegate_Decimal() => InternalGetDelegate_NotSupported<Decimal>();
 
+        [TestMethod] public void GetDelegate_DecimalN() => InternalGetDelegate_NotSupported<Decimal?>();
+
         [TestMethod] public void GetDelegate_Boolean() => InternalGetDelegate_NotSupported<Boolean>();
+
+        [TestMethod] public void GetDelegate_BooleanN() => InternalGetDelegate_NotSupported<Boolean?>();
 
         [TestMethod] public void GetDelegate_Char() => InternalGetDelegate_NotSupported<Char>();
 
+        [TestMethod] public void GetDelegate_CharN() => InternalGetDelegate_NotSupported<Char?>();
+
         [TestMethod] public void GetDelegate_DateTime() => InternalGetDelegate_NotSupported<DateTime>();
+
+        [TestMethod] public void GetDelegate_DateTimeN() => InternalGetDelegate_NotSupported<DateTime?>();
 
         [TestMethod] public void GetDelegate_TimeSpan() => InternalGetDelegate_NotSupported<TimeSpan>();
 
+        [TestMethod] public void GetDelegate_TimeSpanN() => InternalGetDelegate_NotSupported<TimeSpan?>();
+
         [TestMethod] public void GetDelegate_Guid() => InternalGetDelegate_NotSupported<Guid>();
 
-        [TestMethod] public void GetDelegate_NSingle() => InternalGetDelegate_NotSupported<Single?>();
-
-        [TestMethod] public void GetDelegate_NDouble() => InternalGetDelegate_NotSupported<Double?>();
-
-        [TestMethod] public void GetDelegate_NDecimal() => InternalGetDelegate_NotSupported<Decimal?>();
-
-        [TestMethod] public void GetDelegate_NBoolean() => InternalGetDelegate_NotSupported<Boolean?>();
-
-        [TestMethod] public void GetDelegate_NChar() => InternalGetDelegate_NotSupported<Char?>();
-
-        [TestMethod] public void GetDelegate_NDateTime() => InternalGetDelegate_NotSupported<DateTime?>();
-
-        [TestMethod] public void GetDelegate_NTimeSpan() => InternalGetDelegate_NotSupported<TimeSpan?>();
-
-        [TestMethod] public void GetDelegate_NGuid() => InternalGetDelegate_NotSupported<Guid?>();
+        [TestMethod] public void GetDelegate_GuidN() => InternalGetDelegate_NotSupported<Guid?>();
 
         [TestMethod] public void GetDelegate_String() => InternalGetDelegate_NotSupported<String>();
 

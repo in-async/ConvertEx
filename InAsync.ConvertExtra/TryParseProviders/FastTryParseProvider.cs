@@ -52,20 +52,61 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                 //GenericTryParser<double?>.Value = TryParseToNullable;
                 //GenericTryParser<decimal>.Value = (string value, IFormatProvider provider, out decimal result) => decimal.TryParse(value, NumberStyles.Number, provider, out result);
                 //GenericTryParser<decimal?>.Value = TryParseToNullable;
-                //GenericTryParser<bool>.Value = (string value, IFormatProvider provider, out bool result) => bool.TryParse(value, out result);
-                //GenericTryParser<bool?>.Value = (TryParseToNullable;
-                //GenericTryParser<char>.Value = (string value, IFormatProvider provider, out char result) => char.TryParse(value, out result);
-                //GenericTryParser<char?>.Value = TryParseToNullable;
+                GenericTryParsers<bool>.Value = (string value, IFormatProvider provider, out bool result) => {
+                    if (string.IsNullOrEmpty(value) == false) {
+                        value = value.Trim();
+
+                        if (value.Equals("true", StringComparison.OrdinalIgnoreCase)) {
+                            result = true;
+                            return true;
+                        }
+                        else if (value.Equals("false", StringComparison.OrdinalIgnoreCase)) {
+                            result = false;
+                            return true;
+                        }
+                        //switch (value[0]) {
+                        //    case 't':
+                        //    case 'T':
+                        //        if (value.Equals("true", StringComparison.OrdinalIgnoreCase)) {
+                        //            result = true;
+                        //            return true;
+                        //        }
+                        //        break;
+
+                        //    case 'f':
+                        //    case 'F':
+                        //        if (value.Equals("false", StringComparison.OrdinalIgnoreCase)) {
+                        //            result = true;
+                        //            return true;
+                        //        }
+                        //        break;
+                        //}
+                    }
+                    result = default(bool);
+                    return false;
+                };
+                GenericTryParsers<bool?>.Value = TryParseToNullable;
+                GenericTryParsers<char>.Value = (string value, IFormatProvider provider, out char result) => {
+                    if (value?.Length == 1) {
+                        result = value[0];
+                        return true;
+                    }
+                    else {
+                        result = default(char);
+                        return false;
+                    }
+                };
+                GenericTryParsers<char?>.Value = TryParseToNullable;
                 //GenericTryParser<DateTime>.Value = (string value, IFormatProvider provider, out DateTime result) => DateTime.TryParse(value, provider, DateTimeStyles.None, out result);
                 //GenericTryParser<DateTime?>.Value = TryParseToNullable;
                 //GenericTryParser<TimeSpan>.Value = (string value, IFormatProvider provider, out TimeSpan result) => TimeSpan.TryParse(value, provider, out result);
                 //GenericTryParser<TimeSpan?>.Value = TryParseToNullable;
                 //GenericTryParser<Guid>.Value = (string value, IFormatProvider provider, out Guid result) => Guid.TryParse(value, out result);
                 //GenericTryParser<Guid?>.Value = TryParseToNullable;
-                //GenericTryParser<string>.Value = (string value, IFormatProvider provider, out string result) => {
-                //    result = value;
-                //    return true;
-                //};
+                GenericTryParsers<string>.Value = (string value, IFormatProvider provider, out string result) => {
+                    result = value;
+                    return true;
+                };
                 //GenericTryParser<Version>.Value = (string value, IFormatProvider provider, out Version result) => Version.TryParse(value, out result);
                 //GenericTryParser<Uri>.Value = (string value, IFormatProvider provider, out Uri result) => Uri.TryCreate(value, UriKind.Absolute, out result);
             }
@@ -95,39 +136,57 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out sbyte result) {
-                var success = TryParseToInteger(value, provider, out var tmp);
-                result = (sbyte)tmp;
-                return success && (result == tmp);
+                if (TryParseToInteger(value, provider, out var tmp)) {
+                    result = (sbyte)tmp;
+                    if (result == tmp) return true;
+                }
+                result = 0;
+                return false;
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out byte result) {
-                var success = TryParseToUInteger(value, provider, out var tmp);
-                result = (byte)tmp;
-                return success && (result == tmp);
+                if (TryParseToUInteger(value, provider, out var tmp)) {
+                    result = (byte)tmp;
+                    if (result == tmp) return true;
+                }
+                result = 0;
+                return false;
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out short result) {
-                var success = TryParseToInteger(value, provider, out var tmp);
-                result = (short)tmp;
-                return success && (result == tmp);
+                if (TryParseToInteger(value, provider, out var tmp)) {
+                    result = (short)tmp;
+                    if (result == tmp) return true;
+                }
+                result = 0;
+                return false;
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out ushort result) {
-                var success = TryParseToUInteger(value, provider, out var tmp);
-                result = (ushort)tmp;
-                return success && (result == tmp);
+                if (TryParseToUInteger(value, provider, out var tmp)) {
+                    result = (ushort)tmp;
+                    if (result == tmp) return true;
+                }
+                result = 0;
+                return false;
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out int result) {
-                var success = TryParseToInteger(value, provider, out var tmp);
-                result = (int)tmp;
-                return success && (result == tmp);
+                if (TryParseToInteger(value, provider, out var tmp)) {
+                    result = (int)tmp;
+                    if (result == tmp) return true;
+                }
+                result = 0;
+                return false;
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out uint result) {
-                var success = TryParseToUInteger(value, provider, out var tmp);
-                result = (uint)tmp;
-                return success && (result == tmp);
+                if (TryParseToUInteger(value, provider, out var tmp)) {
+                    result = (uint)tmp;
+                    if (result == tmp) return true;
+                }
+                result = 0;
+                return false;
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out long result) {
@@ -263,17 +322,17 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                 //typeof(double?),
                 //typeof(decimal),
                 //typeof(decimal?),
-                //typeof(bool),
-                //typeof(bool?),
-                //typeof(char),
-                //typeof(char?),
+                typeof(bool),
+                typeof(bool?),
+                typeof(char),
+                typeof(char?),
                 //typeof(DateTime),
                 //typeof(DateTime?),
                 //typeof(TimeSpan),
                 //typeof(TimeSpan?),
                 //typeof(Guid),
                 //typeof(Guid?),
-                //typeof(string),
+                typeof(string),
                 //typeof(Version),
                 //typeof(Uri),
             }.ToDictionary(

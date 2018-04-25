@@ -6,9 +6,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace InAsync.ConvertExtras.TryParseProviders.Tests {
 
     [TestClass]
-    public class NativeTryParseProviderTests {
+    public class FastTryParseProviderTests {
 
-        private static NativeTryParseProvider TargetProvider() => NativeTryParseProvider.Default;
+        private static FastTryParseProvider TargetProvider() => FastTryParseProvider.Default;
 
         [TestMethod] public void GetDelegate_Byte() => InternalGetDelegate_Supported<Byte>();
 
@@ -62,23 +62,7 @@ namespace InAsync.ConvertExtras.TryParseProviders.Tests {
 
         [TestMethod] public void GetDelegate_CharN() => InternalGetDelegate_Supported<Char?>();
 
-        [TestMethod] public void GetDelegate_DateTime() => InternalGetDelegate_Supported<DateTime>();
-
-        [TestMethod] public void GetDelegate_DateTimeN() => InternalGetDelegate_Supported<DateTime?>();
-
-        [TestMethod] public void GetDelegate_TimeSpan() => InternalGetDelegate_Supported<TimeSpan>();
-
-        [TestMethod] public void GetDelegate_TimeSpanN() => InternalGetDelegate_Supported<TimeSpan?>();
-
-        [TestMethod] public void GetDelegate_Guid() => InternalGetDelegate_Supported<Guid>();
-
-        [TestMethod] public void GetDelegate_GuidN() => InternalGetDelegate_Supported<Guid?>();
-
         [TestMethod] public void GetDelegate_String() => InternalGetDelegate_Supported<String>();
-
-        [TestMethod] public void GetDelegate_Version() => InternalGetDelegate_Supported<Version>();
-
-        [TestMethod] public void GetDelegate_Uri() => InternalGetDelegate_Supported<Uri>();
 
         private void InternalGetDelegate_Supported<TConversionType>() {
             foreach (var item in TryParseTestCaseStore.Query<TConversionType>()) {
@@ -89,6 +73,22 @@ namespace InAsync.ConvertExtras.TryParseProviders.Tests {
                 (TargetProvider().GetDelegate(item.conversionType)(item.input, item.provider, out var actualResult), actualResult).Is((item.expected, item.expectedResult), $"No.{item.testNumber}");
             }
         }
+
+        [TestMethod] public void GetDelegate_DateTime() => InternalGetDelegate_NotSupported<DateTime>();
+
+        [TestMethod] public void GetDelegate_DateTimeN() => InternalGetDelegate_NotSupported<DateTime?>();
+
+        [TestMethod] public void GetDelegate_TimeSpan() => InternalGetDelegate_NotSupported<TimeSpan>();
+
+        [TestMethod] public void GetDelegate_TimeSpanN() => InternalGetDelegate_NotSupported<TimeSpan?>();
+
+        [TestMethod] public void GetDelegate_Guid() => InternalGetDelegate_NotSupported<Guid>();
+
+        [TestMethod] public void GetDelegate_GuidN() => InternalGetDelegate_NotSupported<Guid?>();
+
+        [TestMethod] public void GetDelegate_Version() => InternalGetDelegate_NotSupported<Version>();
+
+        [TestMethod] public void GetDelegate_Uri() => InternalGetDelegate_NotSupported<Uri>();
 
         [TestMethod] public void GetDelegate_ByteEnum() => InternalGetDelegate_NotSupported<ByteEnum>();
 
