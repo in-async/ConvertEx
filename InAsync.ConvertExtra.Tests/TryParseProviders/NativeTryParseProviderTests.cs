@@ -1,11 +1,14 @@
 ﻿using System;
 using InAsync.Tests.TestHelpers;
+using InAsync.Tests.TestHelpers.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace InAsync.ConvertExtras.TryParseProviders.Tests {
 
     [TestClass]
     public class NativeTryParseProviderTests {
+
+        private static NativeTryParseProvider TargetProvider() => NativeTryParseProvider.Default;
 
         [TestMethod] public void GetDelegate_Byte() => InternalGetDelegate_Supported<Byte>();
 
@@ -78,27 +81,27 @@ namespace InAsync.ConvertExtras.TryParseProviders.Tests {
         [TestMethod] public void GetDelegate_Uri() => InternalGetDelegate_Supported<Uri>();
 
         private void InternalGetDelegate_Supported<TConversionType>() {
-            var target = NativeTryParseProvider.Default;
-
             foreach (var item in TryParseTestCaseStore.Query<TConversionType>()) {
-                (target.GetDelegate<TConversionType>()(item.input, item.provider, out var actualResult), actualResult).Is((item.expected, item.expectedResult), $"No.{item.testNumber}");
+                (TargetProvider().GetDelegate<TConversionType>()(item.input, item.provider, out var actualResult), actualResult).Is((item.expected, item.expectedResult), $"No.{item.testNumber}");
             }
 
             foreach (var item in TryParseTestCaseStore.Query(typeof(TConversionType))) {
-                (target.GetDelegate(item.conversionType)(item.input, item.provider, out var actualResult), actualResult).Is((item.expected, item.expectedResult), $"No.{item.testNumber}");
+                (TargetProvider().GetDelegate(item.conversionType)(item.input, item.provider, out var actualResult), actualResult).Is((item.expected, item.expectedResult), $"No.{item.testNumber}");
             }
         }
 
-        [TestMethod] public void GetDelegate_CustomClass() => InternalGetDelegate_NotSupported<CustomClass>();
+        [TestMethod] public void GetDelegate_ByteEnum() => InternalGetDelegate_NotSupported<ByteEnum>();
 
-        [TestMethod] public void GetDelegate_Enum() => InternalGetDelegate_NotSupported<TestByteEnum>();
+        [TestMethod] public void GetDelegate_IntEnum() => InternalGetDelegate_NotSupported<IntEnum>();
+
+        [TestMethod] public void GetDelegate_TypeConvertableClass() => InternalGetDelegate_NotSupported<TypeConvertableClass>();
+
+        [TestMethod] public void GetDelegate_VanillaClass() => InternalGetDelegate_NotSupported<VanillaClass>();
 
         private void InternalGetDelegate_NotSupported<TConversionType>() {
-            var target = NativeTryParseProvider.Default;
+            TargetProvider().GetDelegate<TConversionType>().Is(null);
 
-            target.GetDelegate<TConversionType>().Is(null);
-
-            target.GetDelegate(typeof(TConversionType)).Is(null);
+            TargetProvider().GetDelegate(typeof(TConversionType)).Is(null);
         }
     }
 }

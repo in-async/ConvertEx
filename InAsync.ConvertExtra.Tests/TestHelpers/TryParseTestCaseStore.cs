@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using InAsync.Tests.TestHelpers.Models;
 
 namespace InAsync.Tests.TestHelpers {
 
@@ -640,76 +641,76 @@ namespace InAsync.Tests.TestHelpers {
                 (21, "1,234.23:45:12.345"        , typeof(TimeSpan?), InvariantCulture, false, null),
             },
             // Enum(byte)
-            [typeof(TestByteEnum)] = new TryParseTestCase[]{
-                ( 1, ""                        , typeof(TestByteEnum), InvariantCulture, false, null),
-                ( 2, "0"                       , typeof(TestByteEnum), InvariantCulture, true , (TestByteEnum)0),
-                ( 3, "0"                       , typeof(TestByteEnum), null            , true , (TestByteEnum)0),
-                ( 4, "\t\n 1\t\n "             , typeof(TestByteEnum), InvariantCulture, true , (TestByteEnum)1),
-                ( 5, nameof(TestByteEnum.None) , typeof(TestByteEnum), InvariantCulture, true , TestByteEnum.None),
-                ( 6, nameof(TestByteEnum.Alpha), typeof(TestByteEnum), InvariantCulture, true , TestByteEnum.Alpha),
-                ( 7, nameof(TestByteEnum.Beta) , typeof(TestByteEnum), InvariantCulture, true , TestByteEnum.Beta),
-                ( 8, "\t\n bETa \t\n "         , typeof(TestByteEnum), InvariantCulture, true , TestByteEnum.Beta),
-                ( 9, "+1"                      , typeof(TestByteEnum), InvariantCulture, true , (TestByteEnum)1),
-                (10, "-1"                      , typeof(TestByteEnum), InvariantCulture, false, null),
-                (12, "0x10"                    , typeof(TestByteEnum), InvariantCulture, false, null),
-                (13, "1234"                    , typeof(TestByteEnum), InvariantCulture, false, null),
-                (14, "1,234"                   , typeof(TestByteEnum), InvariantCulture, false, null),
-                (15, "1,234.56"                , typeof(TestByteEnum), InvariantCulture, false, null),
-                (16, null                      , typeof(TestByteEnum), InvariantCulture, false, null),
+            [typeof(ByteEnum)] = new TryParseTestCase[]{
+                ( 1, ""                    , typeof(ByteEnum), InvariantCulture, false, null),
+                ( 2, "0"                   , typeof(ByteEnum), InvariantCulture, true , (ByteEnum)0),
+                ( 3, "0"                   , typeof(ByteEnum), null            , true , (ByteEnum)0),
+                ( 4, "\t\n 1\t\n "         , typeof(ByteEnum), InvariantCulture, true , (ByteEnum)1),
+                ( 5, nameof(ByteEnum.None) , typeof(ByteEnum), InvariantCulture, true , ByteEnum.None),
+                ( 6, nameof(ByteEnum.Alpha), typeof(ByteEnum), InvariantCulture, true , ByteEnum.Alpha),
+                ( 7, nameof(ByteEnum.Beta) , typeof(ByteEnum), InvariantCulture, true , ByteEnum.Beta),
+                ( 8, "\t\n bETa \t\n "     , typeof(ByteEnum), InvariantCulture, true , ByteEnum.Beta),
+                ( 9, "+1"                  , typeof(ByteEnum), InvariantCulture, true , (ByteEnum)1),
+                (10, "-1"                  , typeof(ByteEnum), InvariantCulture, false, null),
+                (12, "0x10"                , typeof(ByteEnum), InvariantCulture, false, null),
+                (13, "1234"                , typeof(ByteEnum), InvariantCulture, false, null),
+                (14, "1,234"               , typeof(ByteEnum), InvariantCulture, false, null),
+                (15, "1,234.56"            , typeof(ByteEnum), InvariantCulture, false, null),
+                (16, null                  , typeof(ByteEnum), InvariantCulture, false, null),
             },
             // Enum(byte)?
-            [typeof(TestByteEnum?)] = new TryParseTestCase[]{
-                ( 1, ""                        , typeof(TestByteEnum?), InvariantCulture, false, null),
-                ( 2, "0"                       , typeof(TestByteEnum?), InvariantCulture, true , (TestByteEnum)0),
-                ( 3, "0"                       , typeof(TestByteEnum?), null            , true , (TestByteEnum)0),
-                ( 4, "\t\n 1\t\n "             , typeof(TestByteEnum?), InvariantCulture, true , (TestByteEnum)1),
-                ( 5, nameof(TestByteEnum.None) , typeof(TestByteEnum?), InvariantCulture, true , TestByteEnum.None),
-                ( 6, nameof(TestByteEnum.Alpha), typeof(TestByteEnum?), InvariantCulture, true , TestByteEnum.Alpha),
-                ( 7, nameof(TestByteEnum.Beta) , typeof(TestByteEnum?), InvariantCulture, true , TestByteEnum.Beta),
-                ( 8, "\t\n bETa \t\n "         , typeof(TestByteEnum?), InvariantCulture, true , TestByteEnum.Beta),
-                ( 9, "+1"                      , typeof(TestByteEnum?), InvariantCulture, true , (TestByteEnum)1),
-                (10, "-1"                      , typeof(TestByteEnum?), InvariantCulture, false, null),
-                (12, "0x10"                    , typeof(TestByteEnum?), InvariantCulture, false, null),
-                (13, "1234"                    , typeof(TestByteEnum?), InvariantCulture, false, null),
-                (14, "1,234"                   , typeof(TestByteEnum?), InvariantCulture, false, null),
-                (15, "1,234.56"                , typeof(TestByteEnum?), InvariantCulture, false, null),
-                (16, null                      , typeof(TestByteEnum?), InvariantCulture, true , null),
+            [typeof(ByteEnum?)] = new TryParseTestCase[]{
+                ( 1, ""                    , typeof(ByteEnum?), InvariantCulture, false, null),
+                ( 2, "0"                   , typeof(ByteEnum?), InvariantCulture, true , (ByteEnum)0),
+                ( 3, "0"                   , typeof(ByteEnum?), null            , true , (ByteEnum)0),
+                ( 4, "\t\n 1\t\n "         , typeof(ByteEnum?), InvariantCulture, true , (ByteEnum)1),
+                ( 5, nameof(ByteEnum.None) , typeof(ByteEnum?), InvariantCulture, true , ByteEnum.None),
+                ( 6, nameof(ByteEnum.Alpha), typeof(ByteEnum?), InvariantCulture, true , ByteEnum.Alpha),
+                ( 7, nameof(ByteEnum.Beta) , typeof(ByteEnum?), InvariantCulture, true , ByteEnum.Beta),
+                ( 8, "\t\n bETa \t\n "     , typeof(ByteEnum?), InvariantCulture, true , ByteEnum.Beta),
+                ( 9, "+1"                  , typeof(ByteEnum?), InvariantCulture, true , (ByteEnum)1),
+                (10, "-1"                  , typeof(ByteEnum?), InvariantCulture, false, null),
+                (12, "0x10"                , typeof(ByteEnum?), InvariantCulture, false, null),
+                (13, "1234"                , typeof(ByteEnum?), InvariantCulture, false, null),
+                (14, "1,234"               , typeof(ByteEnum?), InvariantCulture, false, null),
+                (15, "1,234.56"            , typeof(ByteEnum?), InvariantCulture, false, null),
+                (16, null                  , typeof(ByteEnum?), InvariantCulture, true , null),
             },
             // Enum(int)
-            [typeof(TestIntEnum)] = new TryParseTestCase[]{
-                ( 1, ""                       , typeof(TestIntEnum), InvariantCulture, false, null),
-                ( 2, "0"                      , typeof(TestIntEnum), InvariantCulture, true , (TestIntEnum)0),
-                ( 3, "0"                      , typeof(TestIntEnum), null            , true , (TestIntEnum)0),
-                ( 4, "\t\n 1\t\n "            , typeof(TestIntEnum), InvariantCulture, true , (TestIntEnum)1),
-                ( 5, nameof(TestIntEnum.None) , typeof(TestIntEnum), InvariantCulture, true , TestIntEnum.None),
-                ( 6, nameof(TestIntEnum.Gamma), typeof(TestIntEnum), InvariantCulture, true , TestIntEnum.Gamma),
-                ( 7, nameof(TestIntEnum.Delta), typeof(TestIntEnum), InvariantCulture, true , TestIntEnum.Delta),
-                ( 8, "\t\n dELta \t\n "       , typeof(TestIntEnum), InvariantCulture, true , TestIntEnum.Delta),
-                ( 9, "+1"                     , typeof(TestIntEnum), InvariantCulture, true , (TestIntEnum)1),
-                (10, "-1"                     , typeof(TestIntEnum), InvariantCulture, true , (TestIntEnum)(-1)),
-                (12, "0x10"                   , typeof(TestIntEnum), InvariantCulture, false, null),
-                (13, "1234"                   , typeof(TestIntEnum), InvariantCulture, true , (TestIntEnum)1234),
-                (14, "1,234"                  , typeof(TestIntEnum), InvariantCulture, false, null),
-                (15, "1,234.56"               , typeof(TestIntEnum), InvariantCulture, false, null),
-                (16, null                     , typeof(TestIntEnum), InvariantCulture, false, null),
+            [typeof(IntEnum)] = new TryParseTestCase[]{
+                ( 1, ""                   , typeof(IntEnum), InvariantCulture, false, null),
+                ( 2, "0"                  , typeof(IntEnum), InvariantCulture, true , (IntEnum)0),
+                ( 3, "0"                  , typeof(IntEnum), null            , true , (IntEnum)0),
+                ( 4, "\t\n 1\t\n "        , typeof(IntEnum), InvariantCulture, true , (IntEnum)1),
+                ( 5, nameof(IntEnum.None) , typeof(IntEnum), InvariantCulture, true , IntEnum.None),
+                ( 6, nameof(IntEnum.Gamma), typeof(IntEnum), InvariantCulture, true , IntEnum.Gamma),
+                ( 7, nameof(IntEnum.Delta), typeof(IntEnum), InvariantCulture, true , IntEnum.Delta),
+                ( 8, "\t\n dELta \t\n "   , typeof(IntEnum), InvariantCulture, true , IntEnum.Delta),
+                ( 9, "+1"                 , typeof(IntEnum), InvariantCulture, true , (IntEnum)1),
+                (10, "-1"                 , typeof(IntEnum), InvariantCulture, true , (IntEnum)(-1)),
+                (12, "0x10"               , typeof(IntEnum), InvariantCulture, false, null),
+                (13, "1234"               , typeof(IntEnum), InvariantCulture, true , (IntEnum)1234),
+                (14, "1,234"              , typeof(IntEnum), InvariantCulture, false, null),
+                (15, "1,234.56"           , typeof(IntEnum), InvariantCulture, false, null),
+                (16, null                 , typeof(IntEnum), InvariantCulture, false, null),
             },
             // Enum(int)?
-            [typeof(TestIntEnum?)] = new TryParseTestCase[]{
-                ( 1, ""                       , typeof(TestIntEnum?), InvariantCulture, false, null),
-                ( 2, "0"                      , typeof(TestIntEnum?), InvariantCulture, true , (TestIntEnum)0),
-                ( 3, "0"                      , typeof(TestIntEnum?), null            , true , (TestIntEnum)0),
-                ( 4, "\t\n 1\t\n "            , typeof(TestIntEnum?), InvariantCulture, true , (TestIntEnum)1),
-                ( 5, nameof(TestIntEnum.None) , typeof(TestIntEnum?), InvariantCulture, true , TestIntEnum.None),
-                ( 6, nameof(TestIntEnum.Gamma), typeof(TestIntEnum?), InvariantCulture, true , TestIntEnum.Gamma),
-                ( 7, nameof(TestIntEnum.Delta), typeof(TestIntEnum?), InvariantCulture, true , TestIntEnum.Delta),
-                ( 8, "\t\n dELta \t\n "       , typeof(TestIntEnum?), InvariantCulture, true , TestIntEnum.Delta),
-                ( 9, "+1"                     , typeof(TestIntEnum?), InvariantCulture, true , (TestIntEnum)1),
-                (10, "-1"                     , typeof(TestIntEnum?), InvariantCulture, true , (TestIntEnum)(-1)),
-                (12, "0x10"                   , typeof(TestIntEnum?), InvariantCulture, false, null),
-                (13, "1234"                   , typeof(TestIntEnum?), InvariantCulture, true , (TestIntEnum)1234),
-                (14, "1,234"                  , typeof(TestIntEnum?), InvariantCulture, false, null),
-                (15, "1,234.56"               , typeof(TestIntEnum?), InvariantCulture, false, null),
-                (16, null                     , typeof(TestIntEnum?), InvariantCulture, true , null),
+            [typeof(IntEnum?)] = new TryParseTestCase[]{
+                ( 1, ""                   , typeof(IntEnum?), InvariantCulture, false, null),
+                ( 2, "0"                  , typeof(IntEnum?), InvariantCulture, true , (IntEnum)0),
+                ( 3, "0"                  , typeof(IntEnum?), null            , true , (IntEnum)0),
+                ( 4, "\t\n 1\t\n "        , typeof(IntEnum?), InvariantCulture, true , (IntEnum)1),
+                ( 5, nameof(IntEnum.None) , typeof(IntEnum?), InvariantCulture, true , IntEnum.None),
+                ( 6, nameof(IntEnum.Gamma), typeof(IntEnum?), InvariantCulture, true , IntEnum.Gamma),
+                ( 7, nameof(IntEnum.Delta), typeof(IntEnum?), InvariantCulture, true , IntEnum.Delta),
+                ( 8, "\t\n dELta \t\n "   , typeof(IntEnum?), InvariantCulture, true , IntEnum.Delta),
+                ( 9, "+1"                 , typeof(IntEnum?), InvariantCulture, true , (IntEnum)1),
+                (10, "-1"                 , typeof(IntEnum?), InvariantCulture, true , (IntEnum)(-1)),
+                (12, "0x10"               , typeof(IntEnum?), InvariantCulture, false, null),
+                (13, "1234"               , typeof(IntEnum?), InvariantCulture, true , (IntEnum)1234),
+                (14, "1,234"              , typeof(IntEnum?), InvariantCulture, false, null),
+                (15, "1,234.56"           , typeof(IntEnum?), InvariantCulture, false, null),
+                (16, null                 , typeof(IntEnum?), InvariantCulture, true , null),
             },
             [typeof(Guid)] = new TryParseTestCase[]{
                 ( 1, ""                                                , typeof(Guid), InvariantCulture, false, null),
@@ -809,17 +810,28 @@ namespace InAsync.Tests.TestHelpers {
                 (14, "ftp://example.com"            , typeof(Uri), InvariantCulture, true, new Uri("ftp://example.com/")),
                 (15, "file:///d:/temp.txt"          , typeof(Uri), InvariantCulture, true, new Uri("file:///d:/temp.txt")),
             },
-            // Custom class
-            [typeof(CustomClass)] = new TryParseTestCase[]{
-                ( 1, ""                             , typeof(CustomClass), InvariantCulture, false, null),
-                ( 2, "0"                            , typeof(CustomClass), InvariantCulture, false, null),
-                ( 3, "+1"                           , typeof(CustomClass), InvariantCulture, false, null),
-                ( 4, "-1"                           , typeof(CustomClass), InvariantCulture, false, null),
-                ( 5, "0x10"                         , typeof(CustomClass), InvariantCulture, false, null),
-                ( 6, "1,234"                        , typeof(CustomClass), InvariantCulture, false, null),
-                ( 7, "1,234.56"                     , typeof(CustomClass), InvariantCulture, false, null),
-                ( 8, null                           , typeof(CustomClass), InvariantCulture, false, null),
-                }
+            // Attributed TypeConverter class
+            [typeof(TypeConvertableClass)] = new TryParseTestCase[]{
+                ( 1, ""        , typeof(TypeConvertableClass), InvariantCulture, true , ""        ),
+                ( 2, "0"       , typeof(TypeConvertableClass), InvariantCulture, true , "0"       ),
+                ( 3, "+1"      , typeof(TypeConvertableClass), InvariantCulture, true , "+1"      ),
+                ( 4, "-1"      , typeof(TypeConvertableClass), InvariantCulture, true , "-1"      ),
+                ( 5, "0x10"    , typeof(TypeConvertableClass), InvariantCulture, true , "0x10"    ),
+                ( 6, "1,234"   , typeof(TypeConvertableClass), InvariantCulture, true , "1,234"   ),
+                ( 7, "1,234.56", typeof(TypeConvertableClass), InvariantCulture, true , "1,234.56"),
+                ( 8, null      , typeof(TypeConvertableClass), InvariantCulture, false, null),
+            },
+            // Vanilla class
+            [typeof(VanillaClass)] = new TryParseTestCase[]{
+                ( 1, ""        , typeof(VanillaClass), InvariantCulture, false, null),
+                ( 2, "0"       , typeof(VanillaClass), InvariantCulture, false, null),
+                ( 3, "+1"      , typeof(VanillaClass), InvariantCulture, false, null),
+                ( 4, "-1"      , typeof(VanillaClass), InvariantCulture, false, null),
+                ( 5, "0x10"    , typeof(VanillaClass), InvariantCulture, false, null),
+                ( 6, "1,234"   , typeof(VanillaClass), InvariantCulture, false, null),
+                ( 7, "1,234.56", typeof(VanillaClass), InvariantCulture, false, null),
+                ( 8, null      , typeof(VanillaClass), InvariantCulture, false, null),
+            }
         };
 
         private readonly static CultureInfo StubJPCulture = ((Func<CultureInfo>)(() => {
@@ -829,20 +841,5 @@ namespace InAsync.Tests.TestHelpers {
             stubCulture.NumberFormat.NaNSymbol = "NaN (非数値)";
             return stubCulture;
         }))();
-    }
-
-    public enum TestByteEnum : byte {
-        None = 0,
-        Alpha = 1,
-        Beta = 2,
-    }
-
-    public enum TestIntEnum : int {
-        None = 0,
-        Gamma = 3,
-        Delta = 4,
-    }
-
-    public class CustomClass {
     }
 }
