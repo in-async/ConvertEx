@@ -7,8 +7,8 @@ namespace InAsync.Tests {
 
     [TestClass]
     public partial class ConvertExtraTest {
-        private static CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
-        private static CultureInfo CurrentCulture = CultureInfo.CurrentCulture;
+        private static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
+        private static readonly CultureInfo CurrentCulture = CultureInfo.CurrentCulture;
 
         private static CultureInfo StubJPCulture = ((Func<CultureInfo>)(() => {
             var stubCulture = new CultureInfo("ja-JP");
