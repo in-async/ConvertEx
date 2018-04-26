@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using InAsync.Tests.TestHelpers.Models;
 
 namespace InAsync.Tests.TestHelpers {
@@ -17,6 +18,10 @@ namespace InAsync.Tests.TestHelpers {
 
         public static IEnumerable<(int testNumber, string input, Type conversionType, IFormatProvider provider, bool expected, object expectedResult)> Query(Type conversionType) {
             return _testCasesByType[conversionType];
+        }
+
+        public static IEnumerable<(int testNumber, string input, Type conversionType, IFormatProvider provider, bool expected, object expectedResult)> Query() {
+            return _testCasesByType.Values.SelectMany(cases => cases);
         }
 
         private static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
