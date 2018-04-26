@@ -42,9 +42,9 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             public static readonly TryParseDelegate<T> Value;
 
             static GenericTryParsers() {
-                GenericTryParsers<byte>.Value = (string value, IFormatProvider provider, out byte result) => byte.TryParse(value, NumberStyles.Integer, provider, out result);
+                GenericTryParsers<byte>.Value = (string value, IFormatProvider provider, out byte result) => byte.TryParse(value, NumberStyles.Integer | NumberStyles.AllowThousands, provider, out result);
                 GenericTryParsers<byte?>.Value = TryParseToNullable;
-                GenericTryParsers<sbyte>.Value = (string value, IFormatProvider provider, out sbyte result) => sbyte.TryParse(value, NumberStyles.Integer, provider, out result);
+                GenericTryParsers<sbyte>.Value = (string value, IFormatProvider provider, out sbyte result) => sbyte.TryParse(value, NumberStyles.Integer | NumberStyles.AllowThousands, provider, out result);
                 GenericTryParsers<sbyte?>.Value = TryParseToNullable;
                 GenericTryParsers<short>.Value = (string value, IFormatProvider provider, out short result) => short.TryParse(value, NumberStyles.Integer | NumberStyles.AllowThousands, provider, out result);
                 GenericTryParsers<short?>.Value = TryParseToNullable;

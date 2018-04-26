@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 
@@ -137,7 +138,7 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out sbyte result) {
-                if (TryParseToInteger(value, provider, out var tmp)) {
+                if (TryParseToInteger(value, out var tmp)) {
                     result = (sbyte)tmp;
                     if (result == tmp) return true;
                 }
@@ -146,7 +147,7 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out byte result) {
-                if (TryParseToUInteger(value, provider, out var tmp)) {
+                if (TryParseToUInteger(value, out var tmp)) {
                     result = (byte)tmp;
                     if (result == tmp) return true;
                 }
@@ -155,7 +156,7 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out short result) {
-                if (TryParseToInteger(value, provider, out var tmp)) {
+                if (TryParseToInteger(value, out var tmp)) {
                     result = (short)tmp;
                     if (result == tmp) return true;
                 }
@@ -164,7 +165,7 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out ushort result) {
-                if (TryParseToUInteger(value, provider, out var tmp)) {
+                if (TryParseToUInteger(value, out var tmp)) {
                     result = (ushort)tmp;
                     if (result == tmp) return true;
                 }
@@ -173,7 +174,7 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out int result) {
-                if (TryParseToInteger(value, provider, out var tmp)) {
+                if (TryParseToInteger(value, out var tmp)) {
                     result = (int)tmp;
                     if (result == tmp) return true;
                 }
@@ -182,7 +183,7 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out uint result) {
-                if (TryParseToUInteger(value, provider, out var tmp)) {
+                if (TryParseToUInteger(value, out var tmp)) {
                     result = (uint)tmp;
                     if (result == tmp) return true;
                 }
@@ -191,24 +192,37 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out long result) {
-                return TryParseToInteger(value, provider, out result);
+                return TryParseToInteger(value, out result);
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out ulong result) {
-                return TryParseToUInteger(value, provider, out result);
+                return TryParseToUInteger(value, out result);
             }
 
-            private static bool TryParseToInteger(string value, IFormatProvider provider, out long result) {
+            private static bool TryParseToInteger(string value, out long result, int? startIndex = null) {
                 if (string.IsNullOrEmpty(value)) {
                     result = 0;
                     return false;
                 }
 
-                value = value.Trim();
                 var offset = 0;
+                if (startIndex == null) {
+                    value = value.Trim();
+                }
+                else if (startIndex < value.Length) {
+                    offset = startIndex.Value;
+                }
+                else {
+                    result = 0;
+                    return false;
+                }
 
                 var sign = 1;
                 switch (value[offset]) {
+                    case InvariantNumberFormat.NumberGroupSeparator:
+                        result = 0;
+                        return false;
+
                     case InvariantNumberFormat.PositiveSign:
                         sign = 1;
                         offset++;
@@ -249,7 +263,7 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                 return true;
             }
 
-            private static bool TryParseToUInteger(string value, IFormatProvider provider, out ulong result) {
+            private static bool TryParseToUInteger(string value, out ulong result) {
                 if (string.IsNullOrEmpty(value)) {
                     result = 0;
                     return false;
@@ -259,6 +273,10 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                 var offset = 0;
 
                 switch (value[offset]) {
+                    case InvariantNumberFormat.NumberGroupSeparator:
+                        result = 0;
+                        return false;
+
                     case InvariantNumberFormat.PositiveSign:
                         offset++;
                         break;
@@ -286,7 +304,7 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out float result) {
-                if (TryParseToFloat(value, provider, out var tmp)) {
+                if (TryParseToFloat(value, out var tmp)) {
                     result = (float)tmp;
                     if (result == tmp) return true;
                 }
@@ -295,18 +313,103 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out double result) {
-                return TryParseToFloat(value, provider, out result);
+                return TryParseToFloat(value, out result);
             }
 
-            private static bool TryParseToFloat(string value, IFormatProvider provider, out double result) {
-                throw new NotImplementedException();
+            private static bool TryParseToFloat(string value, out double result) {
+                if (string.IsNullOrEmpty(value)) {
+                    result = 0;
+                    return false;
+                }
+
+                value = value.Trim();
+                var offset = 0;
+
+                switch (value) {
+                    case InvariantNumberFormat.NaNSymbol:
+                        result = double.NaN;
+                        return true;
+
+                    case InvariantNumberFormat.PositiveInfinitySymbol:
+                        result = double.PositiveInfinity;
+                        return true;
+
+                    case InvariantNumberFormat.NegativeInfinitySymbol:
+                        result = double.NegativeInfinity;
+                        return true;
+                }
+
+                var sign = 1;
+                switch (value[offset]) {
+                    case InvariantNumberFormat.NumberGroupSeparator:
+                        result = 0;
+                        return false;
+
+                    case InvariantNumberFormat.PositiveSign:
+                        sign = 1;
+                        offset++;
+                        break;
+
+                    case InvariantNumberFormat.NegativeSign:
+                        sign = -1;
+                        offset++;
+                        break;
+                }
+
+                BigInteger significand = 0;
+                var decimalSeparatorIndex = -1;
+                var scale = 0L;
+                for (; offset < value.Length; offset++) {
+                    var ch = value[offset];
+                    if (ch == InvariantNumberFormat.NumberGroupSeparator) continue;
+                    if (ch == InvariantNumberFormat.NumberDecimalSeparator) {
+                        if (decimalSeparatorIndex >= 0) {
+                            result = 0;
+                            return false;
+                        }
+                        decimalSeparatorIndex = offset;
+                        continue;
+                    }
+                    if (ch == 'e' || ch == 'E') {
+                        if (TryParseToInteger(value, out scale, startIndex: offset + 1) == false) {
+                            result = 0;
+                            return false;
+                        }
+                        break;
+                    }
+                    if (ch < '0' || '9' < ch) {
+                        result = 0;
+                        return false;
+                    }
+
+                    var prevSignificand = significand;
+                    significand = significand * 10 + sign * (ch - '0');
+                    if (sign > 0) {
+                        if (significand > (BigInteger)double.MaxValue) {
+                            result = 0;
+                            return false;
+                        }
+                    }
+                    else {
+                        if (significand < (BigInteger)double.MinValue) {
+                            result = 0;
+                            return false;
+                        }
+                    }
+                }
+
+                result = (double)significand;
+                if (decimalSeparatorIndex >= 0) {
+                    result /= Math.Pow(10, (offset - decimalSeparatorIndex - 1) - scale);
+                }
+                return true;
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out decimal result) {
-                return TryParseToDecimal(value, provider, out result);
+                return TryParseToDecimal(value, out result);
             }
 
-            private static bool TryParseToDecimal(string value, IFormatProvider provider, out decimal result) {
+            private static bool TryParseToDecimal(string value, out decimal result) {
                 if (string.IsNullOrEmpty(value)) {
                     result = 0;
                     return false;
@@ -317,6 +420,10 @@ namespace InAsync.ConvertExtras.TryParseProviders {
 
                 var sign = 1;
                 switch (value[offset]) {
+                    case InvariantNumberFormat.NumberGroupSeparator:
+                        result = 0;
+                        return false;
+
                     case InvariantNumberFormat.PositiveSign:
                         sign = 1;
                         offset++;
@@ -334,6 +441,10 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                     var ch = value[offset];
                     if (ch == InvariantNumberFormat.NumberGroupSeparator) continue;
                     if (ch == InvariantNumberFormat.NumberDecimalSeparator) {
+                        if (decimalSeparatorIndex >= 0) {
+                            result = 0;
+                            return false;
+                        }
                         decimalSeparatorIndex = offset;
                         continue;
                     }
@@ -360,7 +471,7 @@ namespace InAsync.ConvertExtras.TryParseProviders {
 
                 result = (decimal)significand;
                 if (decimalSeparatorIndex >= 0) {
-                    result = (decimal)significand / (decimal)Math.Pow(10, offset - decimalSeparatorIndex - 1);
+                    result /= (decimal)Math.Pow(10, offset - decimalSeparatorIndex - 1);
                 }
                 return true;
             }
@@ -369,10 +480,15 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             /// Invariant な数値フォーマット情報。
             /// </summary>
             private static class InvariantNumberFormat {
-                public const char NumberGroupSeparator = ',';
-                public const char NumberDecimalSeparator = '.';
-                public const char NegativeSign = '-';
-                public const char PositiveSign = '+';
+                private static readonly NumberFormatInfo InvariantInfo = NumberFormatInfo.InvariantInfo;
+
+                public const char NumberGroupSeparator = ',';   // InvariantInfo.NumberGroupSeparator[0]
+                public const char NumberDecimalSeparator = '.'; // InvariantInfo.NumberDecimalSeparator[0]
+                public const char NegativeSign = '-';           // InvariantInfo.NegativeSign[0]
+                public const char PositiveSign = '+';           // InvariantInfo.PositiveSign[0]
+                public const string NaNSymbol = "NaN";          // InvariantInfo.NaNSymbol
+                public const string NegativeInfinitySymbol = "-Infinity";   // InvariantInfo.NegativeInfinitySymbol
+                public const string PositiveInfinitySymbol = "Infinity";    // InvariantInfo.PositiveInfinitySymbol
             }
         }
 
