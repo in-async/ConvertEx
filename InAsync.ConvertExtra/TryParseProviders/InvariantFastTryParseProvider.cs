@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Numerics;
 
 namespace InAsync.ConvertExtras.TryParseProviders {
 
@@ -15,6 +14,8 @@ namespace InAsync.ConvertExtras.TryParseProviders {
     /// - <c>Int16</c> / <c>UInt16</c>
     /// - <c>Int32</c> / <c>UInt32</c>
     /// - <c>Int64</c> / <c>UInt64</c>
+    /// - <c>Single</c>
+    /// - <c>Double</c>
     /// - <c>Boolean</c>
     /// - <c>Char</c>
     /// - 上記構造体の <c>Nullable</c> 型
@@ -59,10 +60,10 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                 GenericTryParsers<long?>.Value = TryParseToNullable;
                 GenericTryParsers<ulong>.Value = TryParse;
                 GenericTryParsers<ulong?>.Value = TryParseToNullable;
-                //GenericTryParsers<float>.Value = TryParse;
-                //GenericTryParsers<float?>.Value = TryParseToNullable;
-                //GenericTryParsers<double>.Value = TryParse;
-                //GenericTryParsers<double?>.Value = TryParseToNullable;
+                GenericTryParsers<float>.Value = TryParse;
+                GenericTryParsers<float?>.Value = TryParseToNullable;
+                GenericTryParsers<double>.Value = TryParse;
+                GenericTryParsers<double?>.Value = TryParseToNullable;
                 //GenericTryParsers<decimal>.Value = TryParse;
                 //GenericTryParsers<decimal?>.Value = TryParseToNullable;
                 GenericTryParsers<bool>.Value = TryParse;
@@ -274,7 +275,7 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out float result) {
-                if (TryParseToFloat(value, (BigInteger)float.MinValue, (BigInteger)float.MaxValue, out var tmp)) {
+                if (TryParseToFloat(value, float.MinValue, float.MaxValue, out var tmp)) {
                     result = (float)tmp;
                     return true;
                 }
@@ -283,10 +284,10 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out double result) {
-                return TryParseToFloat(value, (BigInteger)double.MinValue, (BigInteger)double.MaxValue, out result);
+                return TryParseToFloat(value, double.MinValue, double.MaxValue, out result);
             }
 
-            private static bool TryParseToFloat(string value, BigInteger minValue, BigInteger maxValue, out double result) {
+            private static bool TryParseToFloat(string value, double minValue, double maxValue, out double result) {
                 if (string.IsNullOrEmpty(value)) {
                     result = 0;
                     return false;
@@ -326,7 +327,7 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                         break;
                 }
 
-                BigInteger significand = 0;
+                var significand = 0d;
                 var decimalSeparatorIndex = -1;
                 var scale = 0L;
                 for (; offset < value.Length; offset++) {
@@ -355,20 +356,20 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                     var prevSignificand = significand;
                     significand = significand * 10 + sign * (ch - '0');
                     if (sign > 0) {
-                        if (significand > maxValue) {
+                        if (significand > maxValue || significand < prevSignificand) {
                             result = 0;
                             return false;
                         }
                     }
                     else {
-                        if (significand < minValue) {
+                        if (significand < minValue || significand > prevSignificand) {
                             result = 0;
                             return false;
                         }
                     }
                 }
 
-                result = (double)significand;
+                result = significand;
                 if (decimalSeparatorIndex >= 0) {
                     result /= Math.Pow(10, (offset - decimalSeparatorIndex - 1) - scale);
                 }
@@ -376,10 +377,10 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out decimal result) {
-                return TryParseToDecimal(value, (BigInteger)decimal.MinValue, (BigInteger)decimal.MaxValue, out result);
+                return TryParseToDecimal(value, decimal.MinValue, decimal.MaxValue, out result);
             }
 
-            private static bool TryParseToDecimal(string value, BigInteger minValue, BigInteger maxValue, out decimal result) {
+            private static bool TryParseToDecimal(string value, decimal minValue, decimal maxValue, out decimal result) {
                 if (string.IsNullOrEmpty(value)) {
                     result = 0;
                     return false;
@@ -405,41 +406,47 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                         break;
                 }
 
-                BigInteger significand = 0;
+                var significand = 0m;
                 var decimalSeparatorIndex = -1;
-                for (; offset < value.Length; offset++) {
-                    var ch = value[offset];
-                    if (ch == InvariantNumberFormat.NumberGroupSeparator) continue;
-                    if (ch == InvariantNumberFormat.NumberDecimalSeparator) {
-                        if (decimalSeparatorIndex >= 0) {
+                try {
+                    for (; offset < value.Length; offset++) {
+                        var ch = value[offset];
+                        if (ch == InvariantNumberFormat.NumberGroupSeparator) continue;
+                        if (ch == InvariantNumberFormat.NumberDecimalSeparator) {
+                            if (decimalSeparatorIndex >= 0) {
+                                result = 0;
+                                return false;
+                            }
+                            decimalSeparatorIndex = offset;
+                            continue;
+                        }
+                        if (ch < '0' || '9' < ch) {
                             result = 0;
                             return false;
                         }
-                        decimalSeparatorIndex = offset;
-                        continue;
-                    }
-                    if (ch < '0' || '9' < ch) {
-                        result = 0;
-                        return false;
-                    }
 
-                    var prevSignificand = significand;
-                    significand = significand * 10 + sign * (ch - '0');
-                    if (sign > 0) {
-                        if (significand > maxValue) {
-                            result = 0;
-                            return false;
+                        var prevSignificand = significand;
+                        significand = significand * 10 + sign * (ch - '0');
+                        if (sign > 0) {
+                            if (significand > maxValue) {
+                                result = 0;
+                                return false;
+                            }
                         }
-                    }
-                    else {
-                        if (significand < minValue) {
-                            result = 0;
-                            return false;
+                        else {
+                            if (significand < minValue) {
+                                result = 0;
+                                return false;
+                            }
                         }
                     }
                 }
+                catch (OverflowException) {
+                    result = 0;
+                    return false;
+                }
 
-                result = (decimal)significand;
+                result = significand;
                 if (decimalSeparatorIndex >= 0) {
                     result /= (decimal)Math.Pow(10, offset - decimalSeparatorIndex - 1);
                 }
@@ -514,10 +521,10 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                 typeof(long?),
                 typeof(ulong),
                 typeof(ulong?),
-                //typeof(float),
-                //typeof(float?),
-                //typeof(double),
-                //typeof(double?),
+                typeof(float),
+                typeof(float?),
+                typeof(double),
+                typeof(double?),
                 //typeof(decimal),
                 //typeof(decimal?),
                 typeof(bool),
