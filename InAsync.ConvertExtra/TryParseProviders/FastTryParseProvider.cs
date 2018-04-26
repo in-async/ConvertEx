@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace InAsync.ConvertExtras.TryParseProviders {
 
@@ -306,7 +307,62 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             }
 
             private static bool TryParseToDecimal(string value, IFormatProvider provider, out decimal result) {
-                throw new NotImplementedException();
+                if (string.IsNullOrEmpty(value)) {
+                    result = 0;
+                    return false;
+                }
+
+                value = value.Trim();
+                var offset = 0;
+
+                var sign = 1;
+                switch (value[offset]) {
+                    case InvariantNumberFormat.PositiveSign:
+                        sign = 1;
+                        offset++;
+                        break;
+
+                    case InvariantNumberFormat.NegativeSign:
+                        sign = -1;
+                        offset++;
+                        break;
+                }
+
+                BigInteger significand = 0;
+                var decimalSeparatorIndex = -1;
+                for (; offset < value.Length; offset++) {
+                    var ch = value[offset];
+                    if (ch == InvariantNumberFormat.NumberGroupSeparator) continue;
+                    if (ch == InvariantNumberFormat.NumberDecimalSeparator) {
+                        decimalSeparatorIndex = offset;
+                        continue;
+                    }
+                    if (ch < '0' || '9' < ch) {
+                        result = 0;
+                        return false;
+                    }
+
+                    var prevSignificand = significand;
+                    significand = significand * 10 + sign * (ch - '0');
+                    if (sign > 0) {
+                        if (significand > (BigInteger)decimal.MaxValue) {
+                            result = 0;
+                            return false;
+                        }
+                    }
+                    else {
+                        if (significand < (BigInteger)decimal.MinValue) {
+                            result = 0;
+                            return false;
+                        }
+                    }
+                }
+
+                result = (decimal)significand;
+                if (decimalSeparatorIndex >= 0) {
+                    result = (decimal)significand / (decimal)Math.Pow(10, offset - decimalSeparatorIndex - 1);
+                }
+                return true;
             }
 
             /// <summary>
