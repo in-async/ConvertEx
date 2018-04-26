@@ -7,9 +7,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace InAsync.ConvertExtras.TryParseProviders.Tests {
 
     [TestClass]
-    public class FastTryParseProviderTests {
+    public class InvariantFastTryParseProviderTests {
 
-        private static FastTryParseProvider TargetProvider() => FastTryParseProvider.Default;
+        private static InvariantFastTryParseProvider TargetProvider() => InvariantFastTryParseProvider.Default;
 
         [TestMethod] public void GetDelegate_Byte() => InternalGetDelegate_Supported<Byte>();
 
@@ -42,18 +42,6 @@ namespace InAsync.ConvertExtras.TryParseProviders.Tests {
         [TestMethod] public void GetDelegate_UInt64() => InternalGetDelegate_Supported<UInt64>();
 
         [TestMethod] public void GetDelegate_UInt64N() => InternalGetDelegate_Supported<UInt64?>();
-
-        [TestMethod] public void GetDelegate_Single() => InternalGetDelegate_Supported<Single>();
-
-        [TestMethod] public void GetDelegate_SingleN() => InternalGetDelegate_Supported<Single?>();
-
-        [TestMethod] public void GetDelegate_Double() => InternalGetDelegate_Supported<Double>();
-
-        [TestMethod] public void GetDelegate_DoubleN() => InternalGetDelegate_Supported<Double?>();
-
-        [TestMethod] public void GetDelegate_Decimal() => InternalGetDelegate_Supported<Decimal>();
-
-        [TestMethod] public void GetDelegate_DecimalN() => InternalGetDelegate_Supported<Decimal?>();
 
         [TestMethod] public void GetDelegate_Boolean() => InternalGetDelegate_Supported<Boolean>();
 
@@ -88,6 +76,18 @@ namespace InAsync.ConvertExtras.TryParseProviders.Tests {
                 }
             }
         }
+
+        [TestMethod] public void GetDelegate_Single() => InternalGetDelegate_NotSupported<Single>();
+
+        [TestMethod] public void GetDelegate_SingleN() => InternalGetDelegate_NotSupported<Single?>();
+
+        [TestMethod] public void GetDelegate_Double() => InternalGetDelegate_NotSupported<Double>();
+
+        [TestMethod] public void GetDelegate_DoubleN() => InternalGetDelegate_NotSupported<Double?>();
+
+        [TestMethod] public void GetDelegate_Decimal() => InternalGetDelegate_NotSupported<Decimal>();
+
+        [TestMethod] public void GetDelegate_DecimalN() => InternalGetDelegate_NotSupported<Decimal?>();
 
         [TestMethod] public void GetDelegate_DateTime() => InternalGetDelegate_NotSupported<DateTime>();
 

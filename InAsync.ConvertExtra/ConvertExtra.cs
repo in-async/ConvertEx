@@ -32,7 +32,7 @@ namespace InAsync {
     public static partial class ConvertExtra {
 
         private static readonly ITryParseProvider _tryParseProvider = new CompositeTryParseProvider(new ITryParseProvider[]{
-            FastTryParseProvider.Default,
+            InvariantFastTryParseProvider.Default,
             NativeTryParseProvider.Default,
             EnumTryParseProvider.Default,
             TypeConverterTryParseProvider.Default,

@@ -1,9 +1,13 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿using System;
+using System.Globalization;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using InAsync.ConvertExtras.TryParseProviders;
-using System;
 
 namespace InAsync.Benchmark {
 
@@ -21,29 +25,36 @@ namespace InAsync.Benchmark {
 
             public Config() {
                 //Add(MarkdownExporter.GitHub);
-                //Add(MemoryDiagnoser.Default);
-                //Add(StatisticColumn.Min, StatisticColumn.Max);
-                Add(Job.Core);
-                //Add(Job.ShortRun);
+                Add(MemoryDiagnoser.Default);
+                Add(StatisticColumn.Min, StatisticColumn.Max);
+                //Add(Job.Core);
+                Add(Job.ShortRun);
             }
         }
 
         [Params("79228162514264337593543950335"/*, "abc"*/)]
         public string Input { get; set; }
 
-        [Benchmark]
-        public void ConvertExtra_TryParse() {
-            ConvertExtra.TryParse<int>(Input, null, out _);
-        }
+        public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
+
+        //[Benchmark]
+        //public void ConvertExtra_TryParse() {
+        //    ConvertExtra.TryParse<int>(Input, null, out _);
+        //}
 
         [Benchmark]
         public void ConvertExtra_FastTryParse() {
-            FastTryParseProvider.Default.GetDelegate<int>(null)(Input, null, out _);
+            InvariantFastTryParseProvider.Default.GetDelegate<sbyte>(Culture)(Input, Culture, out _);
         }
 
         [Benchmark]
         public void ConvertExtra_NativeTryParse() {
-            NativeTryParseProvider.Default.GetDelegate<int>(null)(Input, null, out _);
+            NativeTryParseProvider.Default.GetDelegate<sbyte>(Culture)(Input, Culture, out _);
+        }
+
+        [Benchmark(Baseline = true)]
+        public void Native_TryParse() {
+            sbyte.TryParse(Input, out _);
         }
 
         //[Benchmark]
@@ -65,11 +76,6 @@ namespace InAsync.Benchmark {
         //public int ConvertExtra_To() {
         //    return Input.To<int>();
         //}
-
-        [Benchmark(Baseline = true)]
-        public void Int32_TryParse() {
-            Int32.TryParse(Input, out var result);
-        }
 
         //[Benchmark]
         //public bool foo() {

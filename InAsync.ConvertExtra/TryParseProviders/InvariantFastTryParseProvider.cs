@@ -15,16 +15,13 @@ namespace InAsync.ConvertExtras.TryParseProviders {
     /// - <c>Int16</c> / <c>UInt16</c>
     /// - <c>Int32</c> / <c>UInt32</c>
     /// - <c>Int64</c> / <c>UInt64</c>
-    /// - <c>Single</c>
-    /// - <c>Double</c>
-    /// - <c>Decimal</c>
     /// - <c>Boolean</c>
     /// - <c>Char</c>
     /// - 上記構造体の <c>Nullable</c> 型
     /// - <c>String</c>
     /// </remarks>
-    public class FastTryParseProvider : TryParseProvider {
-        public static readonly FastTryParseProvider Default = new FastTryParseProvider();
+    public class InvariantFastTryParseProvider : TryParseProvider {
+        public static readonly InvariantFastTryParseProvider Default = new InvariantFastTryParseProvider();
 
         public override TryParseDelegate<T> GetDelegate<T>(IFormatProvider provider) {
             if (InvariantNumberFormat.IsInvariant(NumberFormatInfo.GetInstance(provider)) == false) return null;
@@ -62,12 +59,12 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                 GenericTryParsers<long?>.Value = TryParseToNullable;
                 GenericTryParsers<ulong>.Value = TryParse;
                 GenericTryParsers<ulong?>.Value = TryParseToNullable;
-                GenericTryParsers<float>.Value = TryParse;
-                GenericTryParsers<float?>.Value = TryParseToNullable;
-                GenericTryParsers<double>.Value = TryParse;
-                GenericTryParsers<double?>.Value = TryParseToNullable;
-                GenericTryParsers<decimal>.Value = TryParse;
-                GenericTryParsers<decimal?>.Value = TryParseToNullable;
+                //GenericTryParsers<float>.Value = TryParse;
+                //GenericTryParsers<float?>.Value = TryParseToNullable;
+                //GenericTryParsers<double>.Value = TryParse;
+                //GenericTryParsers<double?>.Value = TryParseToNullable;
+                //GenericTryParsers<decimal>.Value = TryParse;
+                //GenericTryParsers<decimal?>.Value = TryParseToNullable;
                 GenericTryParsers<bool>.Value = TryParse;
                 GenericTryParsers<bool?>.Value = TryParseToNullable;
                 GenericTryParsers<char>.Value = TryParse;
@@ -111,68 +108,68 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out sbyte result) {
-                if (TryParseToInteger(value, out var tmp)) {
+                if (TryParseToInteger(value, sbyte.MinValue, sbyte.MaxValue, out var tmp)) {
                     result = (sbyte)tmp;
-                    if (result == tmp) return true;
+                    return true;
                 }
                 result = 0;
                 return false;
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out byte result) {
-                if (TryParseToUInteger(value, out var tmp)) {
+                if (TryParseToUInteger(value, byte.MaxValue, out var tmp)) {
                     result = (byte)tmp;
-                    if (result == tmp) return true;
+                    return true;
                 }
                 result = 0;
                 return false;
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out short result) {
-                if (TryParseToInteger(value, out var tmp)) {
+                if (TryParseToInteger(value, short.MinValue, short.MaxValue, out var tmp)) {
                     result = (short)tmp;
-                    if (result == tmp) return true;
+                    return true;
                 }
                 result = 0;
                 return false;
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out ushort result) {
-                if (TryParseToUInteger(value, out var tmp)) {
+                if (TryParseToUInteger(value, ushort.MaxValue, out var tmp)) {
                     result = (ushort)tmp;
-                    if (result == tmp) return true;
+                    return true;
                 }
                 result = 0;
                 return false;
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out int result) {
-                if (TryParseToInteger(value, out var tmp)) {
+                if (TryParseToInteger(value, int.MinValue, int.MaxValue, out var tmp)) {
                     result = (int)tmp;
-                    if (result == tmp) return true;
+                    return true;
                 }
                 result = 0;
                 return false;
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out uint result) {
-                if (TryParseToUInteger(value, out var tmp)) {
+                if (TryParseToUInteger(value, uint.MaxValue, out var tmp)) {
                     result = (uint)tmp;
-                    if (result == tmp) return true;
+                    return true;
                 }
                 result = 0;
                 return false;
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out long result) {
-                return TryParseToInteger(value, out result);
+                return TryParseToInteger(value, long.MinValue, long.MaxValue, out result);
             }
 
             private static bool TryParse(string value, IFormatProvider provider, out ulong result) {
-                return TryParseToUInteger(value, out result);
+                return TryParseToUInteger(value, ulong.MaxValue, out result);
             }
 
-            private static bool TryParseToInteger(string value, out long result, int? startIndex = null) {
+            private static bool TryParseToInteger(string value, long minValue, long maxValue, out long result, int? startIndex = null) {
                 if (string.IsNullOrEmpty(value)) {
                     result = 0;
                     return false;
@@ -219,13 +216,13 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                     var prevDigit = digit;
                     digit = digit * 10 + sign * (ch - '0');
                     if (sign > 0) {
-                        if (digit < prevDigit) {
+                        if (digit > maxValue || digit < prevDigit) {
                             result = 0;
                             return false;
                         }
                     }
                     else {
-                        if (digit > prevDigit) {
+                        if (digit < minValue || digit > prevDigit) {
                             result = 0;
                             return false;
                         }
@@ -236,7 +233,7 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                 return true;
             }
 
-            private static bool TryParseToUInteger(string value, out ulong result) {
+            private static bool TryParseToUInteger(string value, ulong maxValue, out ulong result) {
                 if (string.IsNullOrEmpty(value)) {
                     result = 0;
                     return false;
@@ -266,7 +263,7 @@ namespace InAsync.ConvertExtras.TryParseProviders {
 
                     var prevDigit = digit;
                     digit = digit * 10 + (ulong)(ch - '0');
-                    if (digit < prevDigit) {
+                    if (digit > maxValue || digit < prevDigit) {
                         result = 0;
                         return false;
                     }
@@ -344,7 +341,7 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                         continue;
                     }
                     if (ch == 'e' || ch == 'E') {
-                        if (TryParseToInteger(value, out scale, startIndex: offset + 1) == false) {
+                        if (TryParseToInteger(value, short.MinValue, short.MaxValue, out scale, startIndex: offset + 1) == false) {
                             result = 0;
                             return false;
                         }
@@ -517,12 +514,12 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                 typeof(long?),
                 typeof(ulong),
                 typeof(ulong?),
-                typeof(float),
-                typeof(float?),
-                typeof(double),
-                typeof(double?),
-                typeof(decimal),
-                typeof(decimal?),
+                //typeof(float),
+                //typeof(float?),
+                //typeof(double),
+                //typeof(double?),
+                //typeof(decimal),
+                //typeof(decimal?),
                 typeof(bool),
                 typeof(bool?),
                 typeof(char),
