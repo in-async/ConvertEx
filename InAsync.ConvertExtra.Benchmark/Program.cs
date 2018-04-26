@@ -38,12 +38,12 @@ namespace InAsync.Benchmark {
 
         [Benchmark]
         public void ConvertExtra_FastTryParse() {
-            FastTryParseProvider.Default.GetDelegate<int>()(Input, null, out _);
+            FastTryParseProvider.Default.GetDelegate<int>(null)(Input, null, out _);
         }
 
         [Benchmark]
         public void ConvertExtra_NativeTryParse() {
-            NativeTryParseProvider.Default.GetDelegate<int>()(Input, null, out _);
+            NativeTryParseProvider.Default.GetDelegate<int>(null)(Input, null, out _);
         }
 
         //[Benchmark]

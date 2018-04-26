@@ -23,9 +23,9 @@ namespace InAsync.ConvertExtras.TryParseProviders {
         /// </summary>
         public IReadOnlyList<ITryParseProvider> Providers { get; }
 
-        public override TryParseDelegate<T> GetDelegate<T>() {
+        public override TryParseDelegate<T> GetDelegate<T>(IFormatProvider provider) {
             for (var i = 0; i < Providers.Count; i++) {
-                var tryParse = Providers[i].GetDelegate<T>();
+                var tryParse = Providers[i].GetDelegate<T>(provider);
                 if (tryParse != null) {
                     return tryParse;
                 }
@@ -33,9 +33,9 @@ namespace InAsync.ConvertExtras.TryParseProviders {
             return null;
         }
 
-        public override TryParseDelegate<object> GetDelegate(Type conversionType) {
+        public override TryParseDelegate<object> GetDelegate(Type conversionType, IFormatProvider provider) {
             for (var i = 0; i < Providers.Count; i++) {
-                var tryParse = Providers[i].GetDelegate(conversionType);
+                var tryParse = Providers[i].GetDelegate(conversionType, provider);
                 if (tryParse != null) {
                     return tryParse;
                 }

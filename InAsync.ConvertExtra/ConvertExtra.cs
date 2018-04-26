@@ -1,7 +1,7 @@
-﻿using InAsync.ConvertExtras.TryParseProviders;
-using System;
+﻿using System;
 using System.Diagnostics.Contracts;
 using System.Globalization;
+using InAsync.ConvertExtras.TryParseProviders;
 
 namespace InAsync {
 
@@ -69,7 +69,7 @@ namespace InAsync {
         /// <param name="result">変換に成功すれば変換後の値、それ以外なら <typeparamref name="T"/> の既定値が返されます。</param>
         /// <returns>変換に成功すれば <c>true</c>、それ以外なら <c>false</c>。</returns>
         public static bool TryParse<T>(string input, IFormatProvider provider, out T result) {
-            var tryParse = _tryParseProvider.GetDelegate<T>();
+            var tryParse = _tryParseProvider.GetDelegate<T>(provider);
             if (tryParse == null) {
                 result = default(T);
                 return false;
@@ -107,7 +107,7 @@ namespace InAsync {
             Contract.Ensures(Contract.Result<bool>() || Contract.ValueAtReturn(out result) == null);
             Contract.EndContractBlock();
 
-            var tryParse = _tryParseProvider.GetDelegate(conversionType);
+            var tryParse = _tryParseProvider.GetDelegate(conversionType, provider);
             if (tryParse == null) {
                 result = null;
                 return false;

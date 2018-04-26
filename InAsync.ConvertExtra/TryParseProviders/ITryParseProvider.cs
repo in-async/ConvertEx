@@ -11,15 +11,17 @@ namespace InAsync.ConvertExtras.TryParseProviders {
         /// 文字列から <typeparamref name="T"/> に変換するデリゲートを返します。
         /// </summary>
         /// <typeparam name="T">変換後の型。</typeparam>
+        /// <param name="provider">カルチャ固有の書式情報。</param>
         /// <returns><typeparamref name="T"/> への変換がサポートされていれば <see cref="TryParseDelegate{T}"/> デリゲートを、それ以外なら <c>null</c> を返します。</returns>
-        TryParseDelegate<T> GetDelegate<T>();
+        TryParseDelegate<T> GetDelegate<T>(IFormatProvider provider);
 
         /// <summary>
         /// 文字列から <paramref name="conversionType"/> に変換するデリゲートを返します。
         /// </summary>
         /// <param name="conversionType">変換後の型。</param>
+        /// <param name="provider">カルチャ固有の書式情報。</param>
         /// <returns><paramref name="conversionType"/> への変換がサポートされていれば <see cref="TryParseDelegate{object}"/> デリゲートを、それ以外なら <c>null</c> を返します。</returns>
-        TryParseDelegate<object> GetDelegate(Type conversionType);
+        TryParseDelegate<object> GetDelegate(Type conversionType, IFormatProvider provider);
     }
 
     /// <summary>

@@ -10,18 +10,18 @@ namespace InAsync.ConvertExtras.TryParseProviders {
     public class TypeConverterTryParseProvider : TryParseProvider {
         public static readonly TypeConverterTryParseProvider Default = new TypeConverterTryParseProvider();
 
-        public override TryParseDelegate<T> GetDelegate<T>() {
+        public override TryParseDelegate<T> GetDelegate<T>(IFormatProvider provider) {
             var converter = GetConverter(typeof(T));
             if (converter == null) return null;
 
-            return (string input, IFormatProvider provider, out T result) => TryParseCore(converter, input, provider, out result);
+            return (string input, IFormatProvider p, out T result) => TryParseCore(converter, input, p, out result);
         }
 
-        public override TryParseDelegate<object> GetDelegate(Type conversionType) {
+        public override TryParseDelegate<object> GetDelegate(Type conversionType, IFormatProvider provider) {
             var converter = GetConverter(conversionType);
             if (converter == null) return null;
 
-            return (string input, IFormatProvider provider, out object result) => TryParseCore(converter, input, provider, out result);
+            return (string input, IFormatProvider p, out object result) => TryParseCore(converter, input, p, out result);
         }
 
         /// <summary>

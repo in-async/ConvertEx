@@ -20,11 +20,11 @@ namespace InAsync.ConvertExtras.TryParseProviders.Tests {
 
         private void InternalGetDelegate_Supported<TConversionType>() {
             foreach (var item in TryParseTestCaseStore.Query<TConversionType>()) {
-                (TargetProvider().GetDelegate<TConversionType>()(item.input, item.provider, out var actualResult), actualResult).Is((item.expected, item.expectedResult), $"No.{item.testNumber}");
+                (TargetProvider().GetDelegate<TConversionType>(item.provider)(item.input, item.provider, out var actualResult), actualResult).Is((item.expected, item.expectedResult), $"No.{item.testNumber}");
             }
 
             foreach (var item in TryParseTestCaseStore.Query(typeof(TConversionType))) {
-                (TargetProvider().GetDelegate(item.conversionType)(item.input, item.provider, out var actualResult), actualResult).Is((item.expected, item.expectedResult), $"No.{item.testNumber}");
+                (TargetProvider().GetDelegate(item.conversionType, item.provider)(item.input, item.provider, out var actualResult), actualResult).Is((item.expected, item.expectedResult), $"No.{item.testNumber}");
             }
         }
 
@@ -103,9 +103,13 @@ namespace InAsync.ConvertExtras.TryParseProviders.Tests {
         [TestMethod] public void GetDelegate_VanillaClass() => InternalGetDelegate_NotSupported<VanillaClass>();
 
         private void InternalGetDelegate_NotSupported<TConversionType>() {
-            TargetProvider().GetDelegate<TConversionType>().Is(null);
+            foreach (var item in TryParseTestCaseStore.Query<TConversionType>()) {
+                TargetProvider().GetDelegate<TConversionType>(item.provider).Is(null);
+            }
 
-            TargetProvider().GetDelegate(typeof(TConversionType)).Is(null);
+            foreach (var item in TryParseTestCaseStore.Query(typeof(TConversionType))) {
+                TargetProvider().GetDelegate(typeof(TConversionType), item.provider).Is(null);
+            }
         }
     }
 }

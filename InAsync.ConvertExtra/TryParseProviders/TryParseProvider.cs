@@ -12,15 +12,17 @@ namespace InAsync.ConvertExtras.TryParseProviders {
         /// 文字列から <typeparamref name="T"/> に変換するデリゲートを返します。
         /// </summary>
         /// <typeparam name="T">変換後の型。</typeparam>
+        /// <param name="provider">カルチャ固有の書式情報。</param>
         /// <returns><typeparamref name="T"/> への変換がサポートされていれば <see cref="TryParseDelegate{T}"/> デリゲートを、それ以外なら <c>null</c> を返します。</returns>
-        public abstract TryParseDelegate<T> GetDelegate<T>();
+        public abstract TryParseDelegate<T> GetDelegate<T>(IFormatProvider provider);
 
         /// <summary>
         /// 文字列から <paramref name="conversionType"/> に変換するデリゲートを返します。
         /// </summary>
         /// <param name="conversionType">変換後の型。</param>
+        /// <param name="provider">カルチャ固有の書式情報。</param>
         /// <returns><paramref name="conversionType"/> への変換がサポートされていれば <see cref="TryParseDelegate{object}"/> デリゲートを、それ以外なら <c>null</c> を返します。</returns>
-        public abstract TryParseDelegate<object> GetDelegate(Type conversionType);
+        public abstract TryParseDelegate<object> GetDelegate(Type conversionType, IFormatProvider provider);
 
         /// <summary>
         /// <paramref name="conversionType"/> を使用して <see cref="ITryParseProvider.GetDelegate{T}"/> からデリゲートを取得し実行する為の、
@@ -52,7 +54,7 @@ namespace InAsync.ConvertExtras.TryParseProviders {
 
             var tmpVar = Expression.Variable(conversionType, "tmp");
             var successVar = Expression.Variable(typeof(bool), "success");
-            var getDelegateCall = Expression.Call(Expression.Constant(this), nameof(GetDelegate), new[] { conversionType });
+            var getDelegateCall = Expression.Call(Expression.Constant(this), nameof(GetDelegate), new[] { conversionType }, providerParam);
             var tryParseCall = Expression.Invoke(getDelegateCall, inputParam, providerParam, tmpVar);
             var bodyExpr = Expression.Block(
                   typeof(bool)

@@ -30,9 +30,9 @@ namespace InAsync.ConvertExtras.TryParseProviders {
     public class NativeTryParseProvider : TryParseProvider {
         public static readonly NativeTryParseProvider Default = new NativeTryParseProvider();
 
-        public override TryParseDelegate<T> GetDelegate<T>() => GenericTryParsers<T>.Value;
+        public override TryParseDelegate<T> GetDelegate<T>(IFormatProvider provider) => GenericTryParsers<T>.Value;
 
-        public override TryParseDelegate<object> GetDelegate(Type conversionType) => NonGenericTryParsers.GetValue(conversionType);
+        public override TryParseDelegate<object> GetDelegate(Type conversionType, IFormatProvider provider) => NonGenericTryParsers.GetValue(conversionType);
 
         /// <summary>
         /// 型パラメーターによって変換デリゲートコレクションを管理するクラス。

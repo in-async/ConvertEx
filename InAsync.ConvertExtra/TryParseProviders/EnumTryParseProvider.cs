@@ -8,18 +8,18 @@ namespace InAsync.ConvertExtras.TryParseProviders {
     public class EnumTryParseProvider : TryParseProvider {
         public static readonly EnumTryParseProvider Default = new EnumTryParseProvider();
 
-        public override TryParseDelegate<T> GetDelegate<T>() {
+        public override TryParseDelegate<T> GetDelegate<T>(IFormatProvider provider) {
             var typeInfo = ConversionTypeInfo.Get(typeof(T));
             if (typeInfo == null) return null;
 
-            return (string input, IFormatProvider provider, out T result) => TryParseCore(typeInfo.Value, input, provider, out result);
+            return (string input, IFormatProvider p, out T result) => TryParseCore(typeInfo.Value, input, p, out result);
         }
 
-        public override TryParseDelegate<object> GetDelegate(Type conversionType) {
+        public override TryParseDelegate<object> GetDelegate(Type conversionType, IFormatProvider provider) {
             var typeInfo = ConversionTypeInfo.Get(conversionType);
             if (typeInfo == null) return null;
 
-            return (string input, IFormatProvider provider, out object result) => TryParseCore(typeInfo.Value, input, provider, out result);
+            return (string input, IFormatProvider p, out object result) => TryParseCore(typeInfo.Value, input, p, out result);
         }
 
         /// <summary>
