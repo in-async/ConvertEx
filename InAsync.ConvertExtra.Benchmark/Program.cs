@@ -44,17 +44,17 @@ namespace InAsync.Benchmark {
 
         [Benchmark]
         public void ConvertExtra_FastTryParse() {
-            InvariantFastTryParseProvider.Default.GetDelegate<sbyte>(Culture)(Input, Culture, out _);
+            InvariantFastTryParseProvider.Default.GetDelegate<decimal>(Culture)(Input, Culture, out _);
         }
 
         [Benchmark]
         public void ConvertExtra_NativeTryParse() {
-            NativeTryParseProvider.Default.GetDelegate<sbyte>(Culture)(Input, Culture, out _);
+            NativeTryParseProvider.Default.GetDelegate<decimal>(Culture)(Input, Culture, out _);
         }
 
         [Benchmark(Baseline = true)]
         public void Native_TryParse() {
-            sbyte.TryParse(Input, out _);
+            decimal.TryParse(Input, out _);
         }
 
         //[Benchmark]

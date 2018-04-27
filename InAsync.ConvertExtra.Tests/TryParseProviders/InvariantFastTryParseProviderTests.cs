@@ -51,6 +51,10 @@ namespace InAsync.ConvertExtras.TryParseProviders.Tests {
 
         [TestMethod] public void GetDelegate_DoubleN() => InternalGetDelegate_Supported<Double?>();
 
+        [TestMethod] public void GetDelegate_Decimal() => InternalGetDelegate_Supported<Decimal>();
+
+        [TestMethod] public void GetDelegate_DecimalN() => InternalGetDelegate_Supported<Decimal?>();
+
         [TestMethod] public void GetDelegate_Boolean() => InternalGetDelegate_Supported<Boolean>();
 
         [TestMethod] public void GetDelegate_BooleanN() => InternalGetDelegate_Supported<Boolean?>();
@@ -84,10 +88,6 @@ namespace InAsync.ConvertExtras.TryParseProviders.Tests {
                 }
             }
         }
-
-        [TestMethod] public void GetDelegate_Decimal() => InternalGetDelegate_NotSupported<Decimal>();
-
-        [TestMethod] public void GetDelegate_DecimalN() => InternalGetDelegate_NotSupported<Decimal?>();
 
         [TestMethod] public void GetDelegate_DateTime() => InternalGetDelegate_NotSupported<DateTime>();
 

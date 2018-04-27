@@ -64,8 +64,8 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                 GenericTryParsers<float?>.Value = TryParseToNullable;
                 GenericTryParsers<double>.Value = TryParse;
                 GenericTryParsers<double?>.Value = TryParseToNullable;
-                //GenericTryParsers<decimal>.Value = TryParse;
-                //GenericTryParsers<decimal?>.Value = TryParseToNullable;
+                GenericTryParsers<decimal>.Value = TryParse;
+                GenericTryParsers<decimal?>.Value = TryParseToNullable;
                 GenericTryParsers<bool>.Value = TryParse;
                 GenericTryParsers<bool?>.Value = TryParseToNullable;
                 GenericTryParsers<char>.Value = TryParse;
@@ -406,50 +406,51 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                         break;
                 }
 
-                var significand = 0m;
+                var bits = new uint[3];
                 var decimalSeparatorIndex = -1;
-                try {
-                    for (; offset < value.Length; offset++) {
-                        var ch = value[offset];
-                        if (ch == InvariantNumberFormat.NumberGroupSeparator) continue;
-                        if (ch == InvariantNumberFormat.NumberDecimalSeparator) {
-                            if (decimalSeparatorIndex >= 0) {
-                                result = 0;
-                                return false;
-                            }
-                            decimalSeparatorIndex = offset;
-                            continue;
-                        }
-                        if (ch < '0' || '9' < ch) {
+                var bitsL3 = new uint[bits.Length];
+                var bitsL1 = new uint[bits.Length];
+                for (; offset < value.Length; offset++) {
+                    var ch = value[offset];
+                    if (ch == InvariantNumberFormat.NumberGroupSeparator) continue;
+                    if (ch == InvariantNumberFormat.NumberDecimalSeparator) {
+                        if (decimalSeparatorIndex >= 0) {
                             result = 0;
                             return false;
                         }
+                        decimalSeparatorIndex = offset;
+                        continue;
+                    }
+                    if (ch < '0' || '9' < ch) {
+                        result = 0;
+                        return false;
+                    }
 
-                        var prevSignificand = significand;
-                        significand = significand * 10 + sign * (ch - '0');
-                        if (sign > 0) {
-                            if (significand > maxValue) {
-                                result = 0;
-                                return false;
-                            }
-                        }
-                        else {
-                            if (significand < minValue) {
-                                result = 0;
-                                return false;
-                            }
-                        }
+                    var carry = (ulong)(ch - '0');
+                    uint carryL3 = 0, carryL1 = 0;
+                    for (var j = 0; j < bits.Length; j++) {
+                        // bits を8倍。
+                        bitsL3[j] = (bits[j] << 3) | carryL3;
+                        carryL3 = bits[j] >> 29;
+
+                        // bits を2倍。
+                        bitsL1[j] = (bits[j] << 1) | carryL1;
+                        carryL1 = bits[j] >> 31;
+
+                        // 8倍と2倍を合算（＝10倍）。
+                        var tmp = (ulong)bitsL3[j] + bitsL1[j] + carry;
+                        carry = tmp >> 32;
+                        bits[j] = (uint)tmp;
+                    }
+                    // キャリーオーバー（オーバーフロー）の確認。
+                    if (carryL3 != 0 || carryL1 != 0 || carry != 0) {
+                        result = 0;
+                        return false;
                     }
                 }
-                catch (OverflowException) {
-                    result = 0;
-                    return false;
-                }
 
-                result = significand;
-                if (decimalSeparatorIndex >= 0) {
-                    result /= (decimal)Math.Pow(10, offset - decimalSeparatorIndex - 1);
-                }
+                var scale = (decimalSeparatorIndex < 0) ? (byte)0 : (byte)(offset - decimalSeparatorIndex - 1);
+                result = new decimal((int)bits[0], (int)bits[1], (int)bits[2], sign < 0, scale);
                 return true;
             }
 
@@ -525,8 +526,8 @@ namespace InAsync.ConvertExtras.TryParseProviders {
                 typeof(float?),
                 typeof(double),
                 typeof(double?),
-                //typeof(decimal),
-                //typeof(decimal?),
+                typeof(decimal),
+                typeof(decimal?),
                 typeof(bool),
                 typeof(bool?),
                 typeof(char),
